@@ -276,21 +276,6 @@ let userName="Bunnies";
 let opened=false;
 let musicStarted=false;
 
-/* ✨ 生成不规则波点 */
-function createDots(){
-let container=document.getElementById("dots");
-for(let i=0;i<45;i++){
-let d=document.createElement("div");
-d.className="dot";
-let size=8+Math.random()*10;
-d.style.width=size+"px";
-d.style.height=size+"px";
-d.style.left=Math.random()*100+"vw";
-d.style.top=Math.random()*100+"vh";
-d.style.animationDelay=Math.random()*3+"s";
-container.appendChild(d);
-}
-}
 
 window.onload=function(){
 document.querySelector(".cover").classList.add("loaded");
