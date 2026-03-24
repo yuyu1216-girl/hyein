@@ -14,14 +14,13 @@ body,input,button{
     overflow:hidden;
 }
 
-/* 背景 */
+/* 背景（香芋紫） */
 .bg{
     position:fixed;
     width:100%;
     height:100vh;
     background:#d9c6ea;
 }
-
 .bg::after{
     content:"";
     position:absolute;
@@ -37,7 +36,6 @@ body,input,button{
     height:100%;
     pointer-events:none;
 }
-
 .dots::before{
     content:"";
     position:absolute;
@@ -48,7 +46,6 @@ body,input,button{
     background-size:80px 80px;
     animation:breath1 5s ease-in-out infinite alternate;
 }
-
 .dots::after{
     content:"";
     position:absolute;
@@ -60,7 +57,6 @@ body,input,button{
     background-size:80px 80px;
     animation:breath2 6s ease-in-out infinite alternate;
 }
-
 @keyframes breath1{
     from{opacity:0.5;}
     to{opacity:1;}
@@ -86,16 +82,16 @@ body,input,button{
 }
 .page.active{opacity:1;pointer-events:auto;}
 
-/* 封面 */
+/* 封面（微信适配） */
 .cover{
-    width:100vw;
-    height:100vh;
-    object-fit:cover;
+    width:92%;
+    max-width:600px;
+    border-radius:20px;
 }
 
 /* 标题 */
 .title{
-    font-size:60px;
+    font-size:56px;
     color:#caa6ff;
 }
 
@@ -114,7 +110,7 @@ input{
 /* 按钮 */
 button{
     margin-top:20px;
-    padding:14px 38px;
+    padding:14px 36px;
     border:none;
     background:rgba(200,160,255,0.6);
     color:#fff;
@@ -128,81 +124,77 @@ button:hover{
     box-shadow:0 0 15px rgba(180,120,255,0.6);
 }
 
-/* 信封 */
+/* 信封（更真实） */
 .envelope{
-    width:520px;
-    height:300px;
+    width:420px;
+    height:240px;
     position:relative;
     cursor:pointer;
+    border-radius:14px;
+    border:1px solid rgba(200,160,255,0.4);
 }
 
+/* 紫色三角盖 */
 .flap{
     position:absolute;
-    width:100%;height:100%;
-    background:#e2c6ff;
-    clip-path:polygon(0 0,100% 0,50% 65%);
+    width:100%;
+    height:100%;
+    background:linear-gradient(135deg,#caa6ff,#e2c6ff);
+    clip-path:polygon(0 0,100% 0,50% 70%);
     transform-origin:top;
     transition:0.5s;
+    box-shadow:0 4px 12px rgba(150,100,255,0.3);
 }
 
 .envelope.open .flap{
     transform:rotateX(180deg);
 }
 
+/* 信封身体 */
 .body{
     position:absolute;
-    width:100%;height:100%;
+    width:100%;
+    height:100%;
     background:white;
     border-radius:14px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.1);
 }
 
-/* 信纸（不滚动 + 排版优化） */
+/* 信纸（不滚动 + 优雅排版） */
 .letter{
-    width:94vw;
-    height:88vh;
-    max-width:none;
-
+    width:92%;
+    max-width:600px;
     background:rgba(255,255,255,0.65);
     backdrop-filter:blur(12px);
     border-radius:24px;
-
-    padding:40px 50px;
-
+    padding:30px;
     font-size:20px;
     line-height:2.3;
-
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
 }
 
-/* ✅ 段落排版优化 */
+/* 段落排版 */
 .letter p{
     text-indent:2em;
     margin-bottom:12px;
 }
-
 .letter p:first-child{
     text-indent:0;
 }
 
 /* 卡片 */
 .card{
-    width:92vw;
-    max-width:600px;
-
-    padding:40px;
-
+    width:90%;
+    max-width:520px;
+    padding:32px;
     background:rgba(255,255,255,0.55);
     backdrop-filter:blur(18px);
     border-radius:24px;
-
     text-align:center;
-    font-size:24px;
+    font-size:22px;
     line-height:2.4;
 }
 
-/* 地图 */
+/* 地图按钮 */
 .map{
     display:inline-block;
     padding:10px 22px;
@@ -327,13 +319,13 @@ function confirmAttend(){
 for(let i=0;i<12;i++){
 let h=document.createElement("div");
 h.className="heart";
-h.innerHTML="💖","🍓";
+h.innerHTML="💖";
 h.style.left=Math.random()*100+"vw";
 h.style.top="60vh";
 document.body.appendChild(h);
 setTimeout(()=>h.remove(),1800);
 }
-alert("🍓 "+userName+" 我们4.18见！");
+alert("🍓 "+userName+" 4.18见！");
 }
 </script>
 
