@@ -6,7 +6,7 @@
 
 <title>Hyein Invitation</title>
 
-<link rel="preload" as="image" href="cover.jpg">
+<link rel="preload" as="image" href="./cover.jpg">
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&family=Noto+Serif+SC:wght@400;500&display=swap" rel="stylesheet">
 
@@ -23,7 +23,7 @@ body,input,button{
     position:fixed;
     width:100%;
     height:100vh;
-    background:#d9c6ea url('cover.jpg') center/cover no-repeat;
+    background:#d9c6ea url('./cover.jpg') center/cover no-repeat;
     filter:blur(20px);
     transform:scale(1.1);
 }
@@ -33,6 +33,24 @@ body,input,button{
     width:100%;
     height:100%;
     background:rgba(217,198,234,0.6);
+}
+
+/* 波点（已修复） */
+.dots{
+    position:fixed;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+}
+.dots::before{
+    content:"";
+    position:absolute;
+    width:200%;
+    height:200%;
+    background:
+    radial-gradient(circle, rgba(255,255,255,0.95) 10px, transparent 11px);
+    background-size:85px 85px;
+    opacity:0.8;
 }
 
 /* 页面 */
@@ -97,7 +115,7 @@ button:hover{
     box-shadow:0 0 15px rgba(180,120,255,0.6);
 }
 
-/* ✉️ 信封 */
+/* 信封 */
 .envelope{
     width:clamp(260px,80vw,380px);
     height:clamp(160px,45vw,240px);
@@ -108,7 +126,6 @@ button:hover{
     box-shadow:0 10px 25px rgba(0,0,0,0.15);
     animation:float 3s ease-in-out infinite;
 }
-
 @keyframes float{
     0%,100%{transform:translateY(0);}
     50%{transform:translateY(-10px);}
@@ -211,17 +228,18 @@ button:hover{
 <body>
 
 <div class="bg"></div>
+<div class="dots"></div>
 
 <audio id="music" src="music.mp3" loop></audio>
 
 <!-- 封面 -->
 <div class="page active" id="p1" onclick="nextPage()">
-<img src="cover.jpg" class="cover">
+<img src="./cover.jpg" class="cover">
 </div>
 
 <!-- 输入 -->
 <div class="page" id="p2">
-<div class="title">Hyein Invitation</div>
+<div class="title">Invitation</div>
 <input id="name" placeholder="Your Name">
 <button onclick="go()">OK</button>
 </div>
