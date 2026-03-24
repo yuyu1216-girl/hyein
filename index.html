@@ -5,126 +5,89 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- 字体 -->
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;600&family=Noto+Serif:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600&family=Playfair+Display&family=Dancing+Script&display=swap" rel="stylesheet">
 
-<title>Hyein Invitation</title>
+<title>Invitation</title>
 
 <style>
 body {
     margin: 0;
-    font-family: 'Noto Sans', sans-serif;
     overflow: hidden;
-    color: #333;
-}
-.letter-container {
-    display: flex;
-    justify-content: center;
+    background: #e9dcff;
+    font-family: 'Noto Serif SC', serif;
 }
 
-.letter {
-    max-width: 300px;
-    margin: 0 auto;
-    background: #fff;
-    padding: 20px 18px;
-    border-radius: 16px;
-
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-
-    font-family: 'Noto Serif', serif;
-    line-height: 1.9;
-    color: #444;
-    border: 1px solid #eee;
+/* 波点背景 */
+.bg {
+    background-color: #e9dcff;
+    background-image: radial-gradient(white 2px, transparent 2px);
+    background-size: 24px 24px;
 }
 
-/* 段落更像信 */
-.letter p {
-    margin-bottom: 12px;
-    text-indent: 2em;
-}
-
-/* 第一行标题 */
-.letter p:first-child {
-    text-indent: 0;
-    text-align: center;
-    font-weight: 600;
-    color: #7b5cff;
-}
-    
-/* 页面结构 */
-.container {
-    height: 100vh;
-    width: 100%;
-    position: relative;
-}
-
+/* 页面 */
 .page {
     position: absolute;
     width: 100%;
     height: 100%;
-    top: 0;
-    left: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    transition: 0.7s ease;
+    transition: 0.8s;
 }
 
 .hidden {
     transform: translateY(100%);
 }
 
-/* 背景 */
-.bg {
-    background: url('bg.jpg');
-    background-size: cover;
-    background-position: center;
+/* 信封 */
+.envelope {
+    width: 220px;
+    height: 140px;
+    background: #fff;
+    position: relative;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 }
 
-/* 封面 */
-.cover {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: url('bg.jpg');
-    background-size: cover;
-    background-position: center;
+.flap {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #d7c2ff;
+    clip-path: polygon(0 0, 100% 0, 50% 60%);
+    transform-origin: top;
+    transition: 0.8s;
 }
 
-.cover img {
-    width: 90%;
-    height: 90%;
-    object-fit: contain;
+.open .flap {
+    transform: rotateX(180deg);
 }
-    
-/* 卡片（高级感关键✨） */
+
+.envelope-text {
+    margin-top: 20px;
+    color: #6a4ed9;
+    font-size: 14px;
+}
+
+/* 卡片 */
 .card {
-    width: 88%;
+    width: 90%;
     max-width: 420px;
-    background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(10px);
-    border-radius: 22px;
-    padding: 28px 24px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.18);
-}
-
-/* 标题 */
-h2, h3 {
-    font-family: 'Noto Serif', serif;
+    background: rgba(255,255,255,0.9);
+    border-radius: 24px;
+    padding: 30px;
     text-align: center;
-    margin-bottom: 16px;
-    color: #5b4bff;
-    letter-spacing: 1px;
 }
 
-/* 输入框 */
+/* 输入 */
 .input {
     padding: 12px;
     width: 80%;
     border-radius: 20px;
-    border: 1px solid #ddd;
+    border: none;
     text-align: center;
-    font-size: 14px;
 }
 
 /* 按钮 */
@@ -132,45 +95,55 @@ h2, h3 {
     margin-top: 18px;
     padding: 12px;
     width: 70%;
-    background: linear-gradient(135deg, #7b5cff, #9f8bff);
-    color: white;
+    background: linear-gradient(135deg,#9b7bff,#c3a6ff);
     border: none;
     border-radius: 25px;
-    font-size: 14px;
+    color: white;
 }
 
-/* 信件（重点✨） */
+/* 标题 */
+.title {
+    font-family: 'Dancing Script', cursive;
+    font-size: 40px;
+    color: #b799ff;
+}
+
+.big {
+    font-size: 36px;
+    color: #a07bff;
+}
+
+/* 信件 */
 .letter {
-    font-family: 'Noto Serif', serif;
-    font-size: 15px;
-    line-height: 1.9;
-    letter-spacing: 0.5px;
-    color: #444;
-    white-space: pre-line;
-    padding: 10px 5px;
+    color: #4b3c8c;
+    line-height: 2.2;
+    font-size: 17px;
 }
 
 .letter p {
-    text-indent: 2em;
-    margin: 10px 0;
+    margin: 14px 0;
 }
 
-.letter p:first-child {
-    text-indent: 0;
-    font-weight: 600;
+.signature {
+    margin-top: 30px;
+    text-align: right;
+    font-family: 'Playfair Display', serif;
 }
-    
-/* 信息卡片 */
+
+/* 信息 */
 .info {
-    font-size: 14px;
-    line-height: 1.8;
-    text-align: center;
+    line-height: 2;
+    color: #4b3c8c;
 }
 
-/* 小标题 */
-.label {
-    color: #7b5cff;
-    font-weight: 600;
+/* 淡入 */
+.fade {
+    animation: fadeIn 1.2s forwards;
+}
+
+@keyframes fadeIn {
+    from {opacity:0}
+    to {opacity:1}
 }
 </style>
 </head>
@@ -179,139 +152,130 @@ h2, h3 {
 
 <audio id="music" src="music.mp3" loop></audio>
 
-<div class="container">
-
-<!-- 输入页 -->
-<div class="page bg">
+    <div class="page" id="coverPage" onclick="enterMain()">
+    <img src="cover.jpg" style="
+        width:100%;
+        height:100%;
+        object-fit:contain;
+        background:#e9dcff;
+    ">
+</div>
+<div class="page bg" id="page0">
     <div class="card">
-        <h3>💜 Bunnies Invitation 💜</h3>
-        <input class="input" id="nameInput" placeholder="请输入你的名字">
-        <div style="text-align:center;">
-            <button class="btn" onclick="start()">进入邀请函</button>
-        </div>
+        <div class="title">Invitation</div>
+        <div class="big">邀请函</div>
+        <br>
+        <input class="input" id="nameInput" placeholder="输入你的名字">
+        <br>
+        <button class="btn" onclick="openEnvelope()">进入</button>
     </div>
 </div>
 
-<!-- 封面 -->
-<div class="page hidden cover" onclick="nextPage()">
-    <img src="cover.jpg">
-</div>
-
-<!-- 信件 -->
-<div class="page hidden bg">
-    <div class="card">
-    <div class="letter-container">
-        <div class="letter" id="letter"></div>
+<div class="page bg hidden" id="page1">
+    <div class="envelope" id="env" onclick="openLetter()">
+        <div class="flap"></div>
     </div>
+    <div class="envelope-text">点击打开Hyein的信 💌</div>
 </div>
 
-<!-- 活动信息 -->
-<div class="page hidden bg">
+<div class="page bg hidden" id="page2">
+    <div class="card letter" id="letter"></div>
+</div>
+
+<div class="page bg hidden" id="page3">
     <div class="card info">
-
-    <div class="label">📍 益+coffee&tea</div>
-    <br>
-
-    📅 2026.04.18  
-    <br><br>
-
-    💜 Hyein Birthday Event  
-    <br><br>
-
-    Dress Code：紫色 / 波点  
-
-    <br><br>
-
-    <a href="https://surl.amap.com/cYD2lgm1A9q1" target="_blank">
-        <button class="btn">📍 点击导航</button>
-    </a>
-
-</div>
-
-<!-- RSVP -->
-<div class="page hidden bg">
-    <div class="card" style="text-align:center;">
-        <h3>💌 要来吗？</h3>
-
-        <button class="btn" onclick="alert('💜 '+userName+' 我们4.18见！')">
-            我要来！
-        </button>
+        📍 益+coffee&tea  
+        <br>
+        📅 2026.04.18  
+        <br><br>
+        💜 Hyein Birthday Event  
+        <br><br>
+        <a href="https://surl.amap.com/cYD2lgm1A9q1" target="_blank">
+            <button class="btn">导航</button>
+        </a>
     </div>
 </div>
 
+<div class="page bg hidden" id="page4">
+    <div class="card">
+        💌 要来吗？
+        <br><br>
+        <button class="btn" onclick="alert('💜 '+userName+' 我等你！')">我要来！</button>
+    </div>
 </div>
 
 <script>
-let pages = document.querySelectorAll('.page');
-let current = 0;
-let userName = "Bunnies";
+let current=0;
+let userName="Bunnies";
 
-/* 开始 */
-function start(){
-    let input = document.getElementById("nameInput").value;
-    if(input){
-        userName = input;
-    }
+/* 音乐淡入 */
+function playMusic(){
+    let audio=document.getElementById("music");
+    audio.volume=0;
+    audio.play();
+    let v=0;
+    let fade=setInterval(()=>{
+        if(v<1){
+            v+=0.05;
+            audio.volume=v;
+        }else{
+            clearInterval(fade);
+        }
+    },200);
+}
 
-    let audio = document.getElementById("music");
-
-    audio.play().then(()=>{
-        console.log("播放成功");
-    }).catch(()=>{
-        console.log("被拦截");
-    });
-
+/* 打开信封前 */
+function openEnvelope(){
+    let input=document.getElementById("nameInput").value;
+    if(input){userName=input;}
     nextPage();
+    playMusic();
+}
+
+/* 打开信封动画 */
+function openLetter(){
+    document.getElementById("env").classList.add("open");
+    setTimeout(()=>{
+        nextPage();
+    },800);
 }
 
 /* 翻页 */
 function nextPage(){
-    if(current < pages.length -1){
-        pages[current].classList.add('hidden');
-        current++;
-        pages[current].classList.remove('hidden');
-        updateLetter();
-    }
+    document.getElementById("page"+current).classList.add("hidden");
+    current++;
+    document.getElementById("page"+current).classList.remove("hidden");
+    updateLetter();
 }
 
-/* 信件内容（优化排版✨） */
+/* 信件 */
 function updateLetter(){
-    document.getElementById("letter").innerHTML = `
+document.getElementById("letter").innerHTML=`
 <p>To 亲爱的 ${userName}：</p>
 
-<p>안녕하세요~ 我是 Hyein！🐹<br>
-好久不见，最近过得好吗？</p>
+<p>안녕하세요~ 我是 Hyein！🐹</p>
+
+<p>好久不见，最近过得好吗？</p>
 
 <p>我最近过得超～级幸福，<br>
-因为我的生日快到啦！</p>
+因为我的生日快到啦！ 🎂✨</p>
 
 <p>这一次，我想邀请最爱的你<br>
 一起度过这个特别的日子 💜</p>
 
 <p>你愿意来吗？<br>
-我已经开始期待见到你了！</p>
+我已经开始期待见到你了！ 🥺💖</p>
 
-<p>如果不能来也没关系，<br>
-你的祝福我一定会收到的～</p>
-
-<p>那我们那天见啦，不见不散！</p>
-
-<p>사랑해요 🫶🏻<br>
+<p class="signature">
 Yours,<br>
-Hyein</p>
+Hyein
+</p>
 `;
 }
 
-/* 滑动翻页 */
-let startY=0;
-document.addEventListener("touchstart",e=>{
-    startY=e.touches[0].clientY;
-});
-document.addEventListener("touchend",e=>{
-    let endY=e.changedTouches[0].clientY;
-    if(startY-endY>50){
-        nextPage();
-    }
+/* 点击翻页 */
+document.addEventListener("click",()=>{
+    if(current>1){nextPage();}
 });
 </script>
 
