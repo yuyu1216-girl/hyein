@@ -21,30 +21,10 @@ body{
     height:100vh;
     background:#eadcff;
     overflow:hidden;
+    filter: blur(0.3px) saturate(1.05);
 }
 
-/* 🫧 梦核波点（已修：不挤 + 更随机） */
-.bg::before{
-    content:"";
-    position:absolute;
-    width:200%;
-    height:200%;
-    background-image:
-    radial-gradient(circle, rgba(255,255,255,0.9) 35px, transparent 37px),
-    radial-gradient(circle, rgba(255,255,255,0.8) 28px, transparent 30px),
-    radial-gradient(circle, rgba(255,255,255,0.7) 45px, transparent 47px);
-
-    background-size:600px 600px, 850px 850px, 500px 500px;
-
-    background-position:
-    0 0,
-    200px 300px,
-    350px 150px;
-
-    animation:floatDots 30s linear infinite, dotGlow 6s ease-in-out infinite alternate;
-}
-
-/* 🌫️ 多层光雾 */
+/* 🌫️ 光雾（保留） */
 .bg::after{
     content:"";
     position:absolute;
@@ -56,22 +36,35 @@ body{
     animation:glow 5s ease-in-out infinite alternate;
 }
 
-@keyframes floatDots{
-    from{transform:translateY(0) rotate(0deg);}
-    to{transform:translateY(-300px) rotate(12deg);}
-}
-
 @keyframes glow{
     from{opacity:0.3;}
     to{opacity:0.7;}
 }
 
-@keyframes dotGlow{
-    from{opacity:0.85;}
-    to{opacity:1;}
+/* 🌌 随机波点 */
+.dots{
+    position:fixed;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    pointer-events:none;
 }
 
-/* 页面切换（梦境感） */
+.dot{
+    position:absolute;
+    border-radius:50%;
+    background:white;
+    opacity:0.8;
+    filter:blur(0.5px);
+    animation:floatUp linear infinite;
+}
+
+@keyframes floatUp{
+    from{transform:translateY(110vh);}
+    to{transform:translateY(-10vh);}
+}
+
+/* 页面 */
 .page{
     position:fixed;
     width:100%;
@@ -94,7 +87,7 @@ body{
 
 /* 封面 */
 .cover{
-    width:90%;
+    width:95%;
     max-width:600px;
     border-radius:20px;
     box-shadow:0 10px 40px rgba(0,0,0,0.2);
@@ -102,24 +95,36 @@ body{
 
 /* 输入 */
 input{
-    padding:14px;
-    border-radius:10px;
+    padding:18px;
+    border-radius:16px;
     border:none;
-    width:260px;
+    width:320px;
+    max-width:80%;
     text-align:center;
-    margin-top:20px;
+    margin-top:24px;
+
+    font-size:20px;
+    letter-spacing:1px;
+
+    box-shadow:0 8px 30px rgba(0,0,0,0.15);
+    outline:none;
 }
 
 button{
-    margin-top:15px;
-    padding:12px 25px;
+    margin-top:20px;
+    padding:14px 36px;
     border:none;
     background:#caa6ff;
     color:white;
-    border-radius:25px;
+    border-radius:30px;
+
+    font-size:18px;
+    letter-spacing:1px;
+
+    box-shadow:0 8px 25px rgba(0,0,0,0.15);
 }
 
-/* 💌 信封 */
+/* 信封 */
 .envelope{
     width:95%;
     max-width:460px;
@@ -145,17 +150,23 @@ button{
     transform:rotateX(180deg);
 }
 
-/* 📄 信件（已放大 + 漂浮） */
+/* 信件（优化版） */
 .letter{
     width:95%;
     max-width:600px;
     height:85vh;
     background:white;
-    border-radius:18px;
-    padding:28px;
-    box-shadow:0 10px 40px rgba(0,0,0,0.2);
+    border-radius:20px;
+    padding:34px 26px;
+    box-shadow:0 15px 60px rgba(0,0,0,0.25);
+
     font-size:20px;
-    line-height:2;
+    line-height:2.2;
+    letter-spacing:0.6px;
+
+    display:flex;
+    flex-direction:column;
+
     animation:floatCard 5s ease-in-out infinite alternate;
 }
 
@@ -178,7 +189,6 @@ button{
     line-height:2;
 }
 
-/* 点击地址 */
 .map{
     color:#b07cff;
     text-decoration:underline;
@@ -187,7 +197,7 @@ button{
 
 .title{
     font-family:'Playfair Display',serif;
-    font-size:48px;
+    font-size:56px;
     color:#caa6ff;
 }
 </style>
@@ -196,6 +206,7 @@ button{
 <body>
 
 <div class="bg"></div>
+<div class="dots"></div>
 
 <audio id="music" src="music.mp3" loop></audio>
 
@@ -244,6 +255,7 @@ Dress Code：紫色 / 波点<br><br>
 let page=1;
 let userName="Bunnies";
 
+/* 翻页 */
 function nextPage(){
 document.getElementById("p"+page).classList.remove("active");
 page++;
@@ -251,12 +263,13 @@ document.getElementById("p"+page).classList.add("active");
 updateLetter();
 }
 
+/* 进入 */
 function go(){
 let name=document.getElementById("name").value;
 if(name!=="") userName=name;
 
 let music=document.getElementById("music");
-music.volume=0.3; // ✔ 已加快进入
+music.volume=0.3;
 music.play();
 
 let v=0.3;
@@ -268,41 +281,87 @@ else clearInterval(fade);
 nextPage();
 }
 
+/* 信封 */
 function openEnvelope(el){
 el.classList.toggle("open");
 }
 
+/* 信件（内容完全保留，只优化排版） */
 function updateLetter(){
 document.getElementById("letter").innerHTML = `
-<p>To 亲爱的 ${userName}：</p>
+<p style="margin-bottom:20px;">To 亲爱的 ${userName}：</p>
 
-<p>안녕하세요~ 我是Hyein！🐹</p>
+<p style="margin-bottom:16px;">안녕하세요~ 我是Hyein！🐹</p>
 
-<p>好久不见，大家最近过得好吗？我最近过得超～级幸福，因为……我的生日快到啦！🎂✨</p>
+<p style="margin-bottom:16px;">
+好久不见，大家最近过得好吗？我最近过得超～级幸福，因为……我的生日快到啦！🎂✨
+</p>
 
-<p>这一次，我想邀请我最爱的你们和我一起度过这个特别的日子！</p>
+<p style="margin-bottom:16px;">
+这一次，我想邀请我最爱的你们和我一起度过这个特别的日子！
+</p>
 
-<p>你愿意来吗？我已经开始期待看到你们的笑容了！🥺💖</p>
+<p style="margin-bottom:16px;">
+你愿意来吗？我已经开始期待看到你们的笑容了！🥺💖
+</p>
 
-<p>如果没有办法来也没关系，只要为我送上祝福，我都会超级感动的！因为只要有Bunnies在，每一天都像生日一样幸福～</p>
+<p style="margin-bottom:16px;">
+如果没有办法来也没关系，只要为我送上祝福，我都会超级感动的！因为只要有Bunnies在，每一天都像生日一样幸福～
+</p>
 
-<p>别忘了：请穿上带有紫色或波点元素的衣服哦～我们一起拍超好看的照片！</p>
+<p style="margin-bottom:16px;">
+别忘了：请穿上带有紫色或波点元素的衣服哦～我们一起拍超好看的照片！
+</p>
 
-<p>那我们那天见啦！不见不散！</p>
+<p style="margin-bottom:16px;">
+那我们那天见啦！不见不散！
+</p>
 
-<p>사랑해요, Bunnies! 🫶🏻</p>
+<p style="margin-bottom:20px;">
+사랑해요, Bunnies! 🫶🏻
+</p>
 
-<p style="text-align:right;">Yours,<br>Hyein</p>
+<p style="text-align:right;margin-top:auto;">
+Yours,<br>Hyein
+</p>
 `;
 }
 
+/* 地图 */
 function goMap(){
 window.open("https://surl.amap.com/cYD2lgm1A9q1");
 }
 
+/* 弹窗 */
 function confirmAttend(){
 alert("💜 "+userName+" 我们4.18见！");
 }
+
+/* 🌌 生成随机波点 */
+function createDots(){
+const container=document.querySelector(".dots");
+
+for(let i=0;i<70;i++){
+let dot=document.createElement("div");
+dot.className="dot";
+
+let size=Math.random()*14+6;
+dot.style.width=size+"px";
+dot.style.height=size+"px";
+
+dot.style.left=Math.random()*100+"%";
+dot.style.top=Math.random()*100+"%";
+
+dot.style.opacity=Math.random()*0.5+0.4;
+
+let duration=Math.random()*8+8;
+dot.style.animationDuration=duration+"s";
+
+container.appendChild(dot);
+}
+}
+
+createDots();
 </script>
 
 </body>
