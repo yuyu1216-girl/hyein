@@ -35,22 +35,23 @@ body,input,button{
     background:rgba(217,198,234,0.6);
 }
 
-/* 波点（已修复） */
+/* ✨ 不规则波点（封神版） */
 .dots{
     position:fixed;
     width:100%;
     height:100%;
     pointer-events:none;
 }
-.dots::before{
-    content:"";
+.dot{
     position:absolute;
-    width:200%;
-    height:200%;
-    background:
-    radial-gradient(circle, rgba(255,255,255,0.95) 10px, transparent 11px);
-    background-size:85px 85px;
+    border-radius:50%;
+    background:white;
     opacity:0.8;
+    animation:breath 3s infinite ease-in-out;
+}
+@keyframes breath{
+    0%,100%{opacity:0.3;transform:scale(0.8);}
+    50%{opacity:1;transform:scale(1.2);}
 }
 
 /* 页面 */
@@ -71,8 +72,8 @@ body,input,button{
 
 /* 封面 */
 .cover{
-    width:90%;
-    max-width:640px;
+    width:92%;
+    max-width:620px;
     border-radius:22px;
     opacity:0;
     transition:opacity 1s;
@@ -81,19 +82,19 @@ body,input,button{
 
 /* 标题 */
 .title{
-    font-size:clamp(42px,6vw,64px);
+    font-size:64px;
     color:#caa6ff;
 }
 
 /* 输入 */
 input{
-    padding:18px;
+    padding:20px;
     border-radius:22px;
     border:none;
     width:80%;
     max-width:360px;
     text-align:center;
-    font-size:clamp(18px,4vw,22px);
+    font-size:22px;
     margin-top:24px;
     background:rgba(255,255,255,0.7);
 }
@@ -101,12 +102,12 @@ input{
 /* 按钮 */
 button{
     margin-top:22px;
-    padding:14px 36px;
+    padding:16px 40px;
     border:none;
     background:rgba(200,160,255,0.7);
     color:#fff;
     border-radius:30px;
-    font-size:clamp(16px,3.8vw,20px);
+    font-size:20px;
     cursor:pointer;
     transition:0.3s;
 }
@@ -117,8 +118,8 @@ button:hover{
 
 /* 信封 */
 .envelope{
-    width:clamp(260px,80vw,380px);
-    height:clamp(160px,45vw,240px);
+    width:360px;
+    height:220px;
     position:relative;
     cursor:pointer;
     border-radius:12px;
@@ -131,13 +132,13 @@ button:hover{
     50%{transform:translateY(-10px);}
 }
 
-/* 三角盖 */
+/* 三角盖（更明显） */
 .flap{
     position:absolute;
     width:100%;
     height:100%;
-    background:#eee;
-    clip-path:polygon(0 0,100% 0,50% 88%);
+    background:#caa6ff;
+    clip-path:polygon(0 0,100% 0,50% 90%);
     transform-origin:top;
     transition:0.5s;
 }
@@ -167,24 +168,24 @@ button:hover{
 
 /* 提示 */
 .hint{
-    margin-top:16px;
-    font-size:clamp(14px,3.5vw,18px);
+    margin-top:18px;
+    font-size:18px;
     color:#8c5cff;
 }
 
 /* 信纸 */
 .letter{
     width:92%;
-    max-width:640px;
-    background:rgba(255,255,255,0.75);
-    border-radius:24px;
-    padding:clamp(22px,5vw,34px);
-    font-size:clamp(16px,4.2vw,22px);
-    line-height:2.3;
+    max-width:620px;
+    background:rgba(255,255,255,0.7);
+    border-radius:26px;
+    padding:34px;
+    font-size:22px;
+    line-height:2.4;
 }
 .letter p{
     text-indent:2em;
-    margin-bottom:12px;
+    margin-bottom:14px;
 }
 .letter p:first-child{
     text-indent:0;
@@ -194,18 +195,18 @@ button:hover{
 .card{
     width:92%;
     max-width:520px;
-    padding:clamp(24px,6vw,36px);
-    background:rgba(255,255,255,0.65);
-    border-radius:24px;
+    padding:36px;
+    background:rgba(255,255,255,0.6);
+    border-radius:26px;
     text-align:center;
-    font-size:clamp(18px,4.5vw,24px);
-    line-height:2.5;
+    font-size:24px;
+    line-height:2.6;
 }
 
 /* 地图 */
 .map{
     display:inline-block;
-    padding:8px 18px;
+    padding:10px 22px;
     border-radius:20px;
     color:#8c5cff;
     cursor:pointer;
@@ -228,7 +229,7 @@ button:hover{
 <body>
 
 <div class="bg"></div>
-<div class="dots"></div>
+<div class="dots" id="dots"></div>
 
 <audio id="music" src="music.mp3" loop></audio>
 
@@ -239,7 +240,7 @@ button:hover{
 
 <!-- 输入 -->
 <div class="page" id="p2">
-<div class="title">Invitation</div>
+<div class="title">Hyein Invitation</div>
 <input id="name" placeholder="Your Name">
 <button onclick="go()">OK</button>
 </div>
@@ -275,8 +276,25 @@ let userName="Bunnies";
 let opened=false;
 let musicStarted=false;
 
+/* ✨ 生成不规则波点 */
+function createDots(){
+let container=document.getElementById("dots");
+for(let i=0;i<45;i++){
+let d=document.createElement("div");
+d.className="dot";
+let size=8+Math.random()*10;
+d.style.width=size+"px";
+d.style.height=size+"px";
+d.style.left=Math.random()*100+"vw";
+d.style.top=Math.random()*100+"vh";
+d.style.animationDelay=Math.random()*3+"s";
+container.appendChild(d);
+}
+}
+
 window.onload=function(){
 document.querySelector(".cover").classList.add("loaded");
+createDots();
 };
 
 function nextPage(){
