@@ -4,146 +4,126 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- 字体 -->
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600&family=Playfair+Display&family=Dancing+Script&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC&family=Playfair+Display&display=swap" rel="stylesheet">
 
-<title>Invitation</title>
+<title>Hyein Dream Invitation</title>
 
 <style>
-body {
-    margin: 0;
-    overflow: hidden;
-    background: #e9dcff;
-    font-family: 'Noto Serif SC', serif;
+body{
+    margin:0;
+    overflow:hidden;
+    font-family:'Noto Serif SC',serif;
+    background:#e8dbff;
 }
 
-/* 波点背景 */
-.bg {
-    background-color: #e9dcff;
-    background-image: radial-gradient(white 2px, transparent 2px);
-    background-size: 24px 24px;
+/* 梦核背景 */
+.bg{
+    background:#e8dbff;
+    position:relative;
+}
+
+.bg::after{
+    content:"";
+    position:absolute;
+    width:200%;
+    height:200%;
+    background:radial-gradient(circle,#ffffff55 2px,transparent 2px);
+    background-size:60px 60px;
+    animation:move 25s linear infinite;
+}
+
+@keyframes move{
+    from{transform:translateY(0)}
+    to{transform:translateY(-200px)}
 }
 
 /* 页面 */
-.page {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    transition: 0.8s;
+.page{
+    position:absolute;
+    width:100%;
+    height:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    transition:0.8s;
 }
 
-.hidden {
-    transform: translateY(100%);
+.hidden{
+    transform:translateY(100%);
 }
 
-/* 信封 */
-.envelope {
-    width: 220px;
-    height: 140px;
-    background: #fff;
-    position: relative;
-    border-radius: 10px;
-    cursor: pointer;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+/* 封面 */
+.cover img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    background:#e8dbff;
 }
 
-.flap {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: #d7c2ff;
-    clip-path: polygon(0 0, 100% 0, 50% 60%);
-    transform-origin: top;
-    transition: 0.8s;
+/* 信封（放大梦核✨） */
+.envelope{
+    width:340px;
+    height:220px;
+    background:#ffffff;
+    border-radius:16px;
+    position:relative;
+    cursor:pointer;
+    box-shadow:0 20px 80px rgba(140,100,255,0.35);
 }
 
-.open .flap {
-    transform: rotateX(180deg);
+.flap{
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:#d8c5ff;
+    clip-path:polygon(0 0,100% 0,50% 65%);
+    transform-origin:top;
+    transition:0.8s;
 }
 
-.envelope-text {
-    margin-top: 20px;
-    color: #6a4ed9;
-    font-size: 14px;
+.open .flap{
+    transform:rotateX(180deg);
 }
 
 /* 卡片 */
-.card {
-    width: 90%;
-    max-width: 420px;
-    background: rgba(255,255,255,0.9);
-    border-radius: 24px;
-    padding: 30px;
-    text-align: center;
-}
-
-/* 输入 */
-.input {
-    padding: 12px;
-    width: 80%;
-    border-radius: 20px;
-    border: none;
-    text-align: center;
-}
-
-/* 按钮 */
-.btn {
-    margin-top: 18px;
-    padding: 12px;
-    width: 70%;
-    background: linear-gradient(135deg,#9b7bff,#c3a6ff);
-    border: none;
-    border-radius: 25px;
-    color: white;
-}
-
-/* 标题 */
-.title {
-    font-family: 'Dancing Script', cursive;
-    font-size: 40px;
-    color: #b799ff;
-}
-
-.big {
-    font-size: 36px;
-    color: #a07bff;
+.card{
+    width:92%;
+    max-width:560px;
+    background:rgba(255,255,255,0.88);
+    backdrop-filter:blur(14px);
+    border-radius:26px;
+    padding:34px;
+    box-shadow:0 10px 40px rgba(0,0,0,0.1);
 }
 
 /* 信件 */
-.letter {
-    color: #4b3c8c;
-    line-height: 2.2;
-    font-size: 17px;
+.letter{
+    font-size:18px;
+    line-height:2.4;
+    text-align:center;
+    color:#3f2b7a;
 }
 
-.letter p {
-    margin: 14px 0;
+.letter p{
+    margin:18px 0;
 }
 
-.signature {
-    margin-top: 30px;
-    text-align: right;
-    font-family: 'Playfair Display', serif;
+.signature{
+    margin-top:30px;
+    text-align:right;
 }
 
-/* 信息 */
-.info {
-    line-height: 2;
-    color: #4b3c8c;
-}
-
-/* 淡入 */
-.fade {
-    animation: fadeIn 1.2s forwards;
-}
-
-@keyframes fadeIn {
-    from {opacity:0}
-    to {opacity:1}
+/* 按钮 */
+.btn{
+    margin-top:20px;
+    padding:12px;
+    width:70%;
+    border:none;
+    border-radius:25px;
+    background:linear-gradient(135deg,#9b7bff,#c8b3ff);
+    color:white;
+    font-size:14px;
 }
 </style>
 </head>
@@ -152,55 +132,43 @@ body {
 
 <audio id="music" src="music.mp3" loop></audio>
 
-    <div class="page" id="coverPage" onclick="enterMain()">
-    <img src="cover.jpg" style="
-        width:100%;
-        height:100%;
-        object-fit:contain;
-        background:#e9dcff;
-    ">
-</div>
-<div class="page bg" id="page0">
-    <div class="card">
-        <div class="title">Invitation</div>
-        <div class="big">邀请函</div>
-        <br>
-        <input class="input" id="nameInput" placeholder="输入你的名字">
-        <br>
-        <button class="btn" onclick="openEnvelope()">进入</button>
-    </div>
+<!-- 封面 -->
+<div class="page cover" id="page0" onclick="start()">
+    <img src="cover.jpg">
 </div>
 
+<!-- 信封 -->
 <div class="page bg hidden" id="page1">
-    <div class="envelope" id="env" onclick="openLetter()">
+    <div class="envelope" id="env" onclick="openEnvelope()">
         <div class="flap"></div>
     </div>
-    <div class="envelope-text">点击打开Hyein的信 💌</div>
+    <p style="color:#6d52d9;margin-top:20px;">点击打开邀请 💌</p>
 </div>
 
-<div class="page bg hidden" id="page2">
+<!-- 信件 -->
+<div class="page bg hidden" id="page2" onclick="nextPage()">
     <div class="card letter" id="letter"></div>
 </div>
 
-<div class="page bg hidden" id="page3">
-    <div class="card info">
-        📍 益+coffee&tea  
-        <br>
-        📅 2026.04.18  
-        <br><br>
-        💜 Hyein Birthday Event  
-        <br><br>
+<!-- 活动信息 -->
+<div class="page bg hidden" id="page3" onclick="nextPage()">
+    <div class="card">
+        📍 广州 · 益+coffee&tea<br><br>
+        📅 2026.04.18<br><br>
+        💜 Hyein Birthday Event<br><br>
+        Dress Code：紫色 / 波点<br><br>
+
         <a href="https://surl.amap.com/cYD2lgm1A9q1" target="_blank">
-            <button class="btn">导航</button>
+            <button class="btn">📍 点击导航</button>
         </a>
     </div>
 </div>
 
+<!-- RSVP -->
 <div class="page bg hidden" id="page4">
-    <div class="card">
-        💌 要来吗？
-        <br><br>
-        <button class="btn" onclick="alert('💜 '+userName+' 我等你！')">我要来！</button>
+    <div class="card" style="text-align:center;">
+        💌 要来吗？<br><br>
+        <button class="btn" onclick="alert('💜 等你来！')">我要来！</button>
     </div>
 </div>
 
@@ -210,34 +178,28 @@ let userName="Bunnies";
 
 /* 音乐淡入 */
 function playMusic(){
-    let audio=document.getElementById("music");
-    audio.volume=0;
-    audio.play();
+    let a=document.getElementById("music");
+    a.volume=0;
+    a.play().catch(()=>{});
     let v=0;
     let fade=setInterval(()=>{
         if(v<1){
             v+=0.05;
-            audio.volume=v;
-        }else{
-            clearInterval(fade);
-        }
+            a.volume=v;
+        }else clearInterval(fade);
     },200);
 }
 
-/* 打开信封前 */
-function openEnvelope(){
-    let input=document.getElementById("nameInput").value;
-    if(input){userName=input;}
-    nextPage();
+/* 开始 */
+function start(){
     playMusic();
+    nextPage();
 }
 
-/* 打开信封动画 */
-function openLetter(){
+/* 打开信封 */
+function openEnvelope(){
     document.getElementById("env").classList.add("open");
-    setTimeout(()=>{
-        nextPage();
-    },800);
+    setTimeout(()=>{nextPage()},800);
 }
 
 /* 翻页 */
@@ -248,35 +210,48 @@ function nextPage(){
     updateLetter();
 }
 
-/* 信件 */
+/* 信件内容（完整版💜） */
 function updateLetter(){
 document.getElementById("letter").innerHTML=`
+
 <p>To 亲爱的 ${userName}：</p>
 
 <p>안녕하세요~ 我是 Hyein！🐹</p>
 
-<p>好久不见，最近过得好吗？</p>
+<p>好久不见，大家最近过得好吗？</p>
 
 <p>我最近过得超～级幸福，<br>
-因为我的生日快到啦！ 🎂✨</p>
+因为……我的生日快到啦！ 🎂✨</p>
 
-<p>这一次，我想邀请最爱的你<br>
-一起度过这个特别的日子 💜</p>
+<p>这一次，<br>
+我想邀请我最爱的你们<br>
+和我一起度过这个特别的日子 💜</p>
 
 <p>你愿意来吗？<br>
-我已经开始期待见到你了！ 🥺💖</p>
+我已经开始期待看到你们的笑容了！ 🥺💖</p>
+
+<p>如果没有办法来也没关系，<br>
+在远方为我送上祝福，<br>
+我也会超级感动的！</p>
+
+<p>因为只要有 Bunnies 在，<br>
+每一天都像生日一样幸福～</p>
+
+<p>别忘了：<br>
+请穿上带有紫色或波点元素的衣服哦～<br>
+我们一起拍超好看的照片！ 📸</p>
+
+<p>那我们那天见啦！不见不散！</p>
+
+<p>사랑해요, Bunnies! 🫶🏻</p>
 
 <p class="signature">
 Yours,<br>
 Hyein
 </p>
+
 `;
 }
-
-/* 点击翻页 */
-document.addEventListener("click",()=>{
-    if(current>1){nextPage();}
-});
 </script>
 
 </body>
