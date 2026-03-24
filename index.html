@@ -9,29 +9,28 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 
-body, input, button{
+body,input,button{
     font-family:'Playfair Display','Noto Serif SC',serif;
     overflow:hidden;
 }
 
-/* 背景 */
+/* 💜 背景 */
 .bg{
     position:fixed;
     width:100%;
     height:100vh;
-    background:#d4bde6;
+    background:#cbb7db;
 }
 
-/* 光雾 */
 .bg::after{
     content:"";
     position:absolute;
     width:100%;
     height:100%;
-    background:radial-gradient(circle at 50% 40%, rgba(255,255,255,0.3), transparent 70%);
+    background:radial-gradient(circle at 50% 40%, rgba(255,255,255,0.35), transparent 70%);
 }
 
-/* 波点 */
+/* ✨ 波点 */
 .dots{
     position:fixed;
     width:100%;
@@ -39,36 +38,34 @@ body, input, button{
     pointer-events:none;
 }
 
-.dots::before{
-    content:"";
-    position:absolute;
-    width:200%;
-    height:200%;
-    background:
-    radial-gradient(circle, rgba(255,255,255,0.9) 7px, transparent 8px);
-    background-size:75px 75px;
-    animation:breath1 4s ease-in-out infinite alternate;
-}
-
+.dots::before,
 .dots::after{
     content:"";
     position:absolute;
     width:200%;
     height:200%;
-    transform:translate(35px,35px);
     background:
-    radial-gradient(circle, rgba(255,255,255,0.8) 6px, transparent 7px);
+    radial-gradient(circle, rgba(255,255,255,0.9) 6px, transparent 7px);
     background-size:75px 75px;
-    animation:breath2 5s ease-in-out infinite alternate;
+}
+
+.dots::before{
+    transform:rotate(2deg) translate(-20px,-10px);
+    animation:breath1 6s ease-in-out infinite alternate;
+}
+.dots::after{
+    transform:rotate(-3deg) translate(40px,30px);
+    opacity:0.7;
+    animation:breath2 7s ease-in-out infinite alternate;
 }
 
 @keyframes breath1{
-    from{opacity:0.5;filter:blur(0px);}
-    to{opacity:1;filter:blur(2px);}
+    from{opacity:0.6;}
+    to{opacity:1;}
 }
 @keyframes breath2{
-    from{opacity:0.3;filter:blur(1px);}
-    to{opacity:0.9;filter:blur(3px);}
+    from{opacity:0.4;}
+    to{opacity:0.9;}
 }
 
 /* 页面 */
@@ -91,13 +88,7 @@ body, input, button{
     width:92%;
     max-width:600px;
     border-radius:20px;
-}
-
-/* 标题 */
-.title{
-    font-size:58px;
-    color:#caa6ff;
-    letter-spacing:2px;
+    filter:hue-rotate(260deg) saturate(0.7) brightness(1.1);
 }
 
 /* 输入 */
@@ -110,7 +101,6 @@ input{
     font-size:20px;
     margin-top:20px;
     background:rgba(255,255,255,0.6);
-    backdrop-filter:blur(6px);
 }
 
 /* 按钮 */
@@ -119,95 +109,104 @@ button{
     padding:12px 34px;
     border:none;
     background:rgba(200,160,255,0.6);
-    backdrop-filter:blur(6px);
     color:#fff;
     border-radius:30px;
-    font-size:16px;
-    letter-spacing:1px;
-    cursor:pointer;
-    transition:0.3s;
-}
-button:hover{
-    transform:scale(1.05);
-    box-shadow:0 0 15px rgba(180,120,255,0.6);
 }
 
-/* 信封 */
+/* ✉️ 信封 */
 .envelope{
     width:420px;height:240px;
     position:relative;
     cursor:pointer;
 }
+
+/* 信纸动画 */
+.paper{
+    position:absolute;
+    width:90%;
+    height:140%;
+    background:white;
+    left:5%;
+    top:20%;
+    border-radius:10px;
+    transform:translateY(80px);
+    transition:1s;
+    opacity:0;
+}
+
+.envelope.open .paper{
+    transform:translateY(-120px);
+    opacity:1;
+}
+
 .flap{
-    position:absolute;width:100%;height:100%;
+    position:absolute;
+    width:100%;height:100%;
     background:#e6ccff;
     clip-path:polygon(0 0,100% 0,50% 60%);
     transform-origin:top;
     transition:0.6s;
 }
-.envelope.open .flap{transform:rotateX(180deg);}
-.body{
-    position:absolute;width:100%;height:100%;
-    background:white;border-radius:12px;
+
+.envelope.open .flap{
+    transform:rotateX(180deg);
 }
 
-/* 信纸 */
+.body{
+    position:absolute;
+    width:100%;height:100%;
+    background:white;
+    border-radius:12px;
+}
+
+/* 📜 信件（无滚动版） */
+#p4{padding:20px;}
+
 .letter{
     width:92%;
     max-width:600px;
-    height:80vh;
+
     background:rgba(255,255,255,0.65);
     backdrop-filter:blur(12px);
     border-radius:20px;
-    padding:30px;
-    font-size:20px;
-    line-height:2.2;
-    overflow-y:auto;
-    opacity:0;
-    transform:translateY(40px);
-    transition:0.8s;
-}
-.letter.show{
-    opacity:1;
-    transform:none;
+
+    padding:28px 30px;
+
+    font-size:18px;
+    line-height:2;
+
+    overflow:hidden;
+    height:auto;
+    max-height:90vh;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
 }
 
-/* 卡片 */
+/* 信息卡 */
 .card{
-    width:88%;
-    max-width:480px;
+    width:90%;
+    max-width:420px;
     padding:28px;
     background:rgba(255,255,255,0.55);
     backdrop-filter:blur(18px);
     border-radius:22px;
-    border:1px solid rgba(255,255,255,0.4);
-    box-shadow:0 10px 40px rgba(0,0,0,0.15);
     text-align:center;
-    font-size:19px;
-    line-height:2;
 }
 
-/* 地图 */
-.map{
-    display:inline-block;
-    padding:8px 18px;
-    border-radius:20px;
-    background:rgba(180,120,255,0.2);
-    color:#8c5cff;
-    cursor:pointer;
-}
-.map:hover{
-    box-shadow:0 0 15px rgba(180,120,255,0.6);
-}
-
-/* 爱心 */
-.heart{
+/* 💭 梦核碎片 */
+.memory{
     position:fixed;
-    color:#ff6b9d;
-    animation:fly 1.8s ease-out forwards;
+    pointer-events:none;
+    animation:float 3s ease forwards;
+    color:rgba(255,255,255,0.7);
 }
-@keyframes fly{
-    to{transform:translateY(-150px);opacity:0;}
+
+@keyframes float{
+    0%{opacity:0;transform:translateY(20px);}
+    30%{opacity:1;}
+    100%{opacity:0;transform:translateY(-40px);}
 }
 </style>
 </head>
@@ -220,13 +219,12 @@ button:hover{
 <audio id="music" src="music.mp3" loop></audio>
 
 <!-- 封面 -->
-<div class="page active" id="p1" onclick="nextPage()">
+<div class="page active" id="p1" onclick="startMusic();nextPage()">
 <img src="cover.jpg" class="cover">
 </div>
 
 <!-- 输入 -->
 <div class="page" id="p2">
-<div class="title">Invitation</div>
 <input id="name" placeholder="Your Name">
 <button onclick="go()">OK</button>
 </div>
@@ -234,6 +232,7 @@ button:hover{
 <!-- 信封 -->
 <div class="page" id="p3">
 <div class="envelope" onclick="openEnvelope(this)">
+<div class="paper"></div>
 <div class="flap"></div>
 <div class="body"></div>
 </div>
@@ -241,7 +240,7 @@ button:hover{
 
 <!-- 信件 -->
 <div class="page" id="p4" onclick="nextPage()">
-<div class="letter" id="letter" onclick="event.stopPropagation()"></div>
+<div class="letter" id="letter"></div>
 </div>
 
 <!-- 信息 -->
@@ -249,7 +248,7 @@ button:hover{
 <div class="card">
 💜 Happy Hyein's Day 💜<br>
 📅 2026.04.18<br>
-📍 <span class="map" onclick="goMap()">益+coffee&tea</span><br>
+📍 <span onclick="window.open('https://surl.amap.com/cYD2lgm1A9q1')">益+coffee&tea</span><br>
 Dress Code：紫色 / 波点<br>
 <button onclick="confirmAttend()">我要来！</button>
 </div>
@@ -259,23 +258,17 @@ Dress Code：紫色 / 波点<br>
 let page=1;
 let userName="Bunnies";
 let opened=false;
-let musicStarted=false;
 
-function nextPage(){
-if(!musicStarted){
-let music=document.getElementById("music");
-music.volume=0.4;
-music.play().catch(()=>{});
-musicStarted=true;
+function startMusic(){
+let m=document.getElementById("music");
+m.volume=0.4;
+m.play().catch(()=>{});
 }
 
+function nextPage(){
 document.getElementById("p"+page).classList.remove("active");
 page++;
 document.getElementById("p"+page).classList.add("active");
-
-if(page===4){
-setTimeout(()=>document.querySelector(".letter").classList.add("show"),200);
-}
 updateLetter();
 }
 
@@ -290,7 +283,7 @@ if(!opened){
 el.classList.add("open");
 opened=true;
 }else{
-setTimeout(()=>nextPage(),200);
+setTimeout(()=>nextPage(),800);
 }
 }
 
@@ -299,56 +292,39 @@ document.getElementById("letter").innerHTML = `
 <p>To 亲爱的 ${userName}：</p>
 <p>안녕하세요~ 我是Hyein！🐹</p>
 <p>好久不见，大家最近过得好吗？我最近过得超～级幸福，因为……我的生日快到啦！🎂✨</p>
-<p>这一次，我想邀请我最爱的你们和我一起度过这个特别的日子！你愿意来吗？我已经开始期待看到你们的笑容了！🥺💖</p>
+<p>这一次，我想邀请我最爱的你们和我一起度过这个特别的日子！你愿意来吗？🥺💖</p>
 <p>如果没有办法来也没关系，只要为我送上祝福，我都会超级感动的！因为只要有Bunnies在，每一天都像生日一样幸福～</p>
 <p>别忘了：请穿上带有紫色或波点元素的衣服哦～我们一起拍超好看的照片！</p>
 <p>那我们那天见啦！不见不散！</p>
 <p>사랑해요, Bunnies! 🫶🏻</p>
-<p style="text-align:right;margin-top:20px;">Yours,<br>Hyein</p>
+<p style="text-align:right;">Yours,<br>Hyein</p>
 `;
 }
 
-function goMap(){
-window.open("https://surl.amap.com/cYD2lgm1A9q1");
-}
-
-function confirmAttend(){
-for(let i=0;i<12;i++){
-let h=document.createElement("div");
-h.className="heart";
-h.innerHTML="💖";
-h.style.left=Math.random()*100+"vw";
-h.style.top="60vh";
-document.body.appendChild(h);
-setTimeout(()=>h.remove(),1800);
-}
-alert("💜 "+userName+" 我们4.18见！");
-}
-
-/* 💭 梦核记忆碎片 */
-const words=["dream","remember","04.18","Hyein","bunnies","NewJeans","2008","18"];
+/* 💭 梦核碎片（强化版） */
+const words=[
+"Hyein","이혜인","李惠仁","NewJeans","Bunnies",
+"birthday","dream","0421","2008","NJZ","forever","우리","행복"
+];
 
 setInterval(()=>{
 let t=document.createElement("div");
+t.className="memory";
 
 t.innerText=words[Math.floor(Math.random()*words.length)];
-t.style.position="fixed";
 t.style.left=Math.random()*90+"vw";
 t.style.top=Math.random()*90+"vh";
 
-t.style.fontSize=(14+Math.random()*10)+"px";
-t.style.opacity="0";
-t.style.color="rgba(255,255,255,0.5)";
-t.style.pointerEvents="none";
-t.style.transition="opacity 1s ease";
+t.style.fontSize=(16+Math.random()*22)+"px";
 
 document.body.appendChild(t);
+setTimeout(()=>t.remove(),3000);
 
-setTimeout(()=>t.style.opacity="0.35",50);
-setTimeout(()=>t.style.opacity="0",1200);
-setTimeout(()=>t.remove(),2000);
+},1500);
 
-},3000);
+function confirmAttend(){
+alert("💜 "+userName+" 4.18见！");
+}
 </script>
 
 </body>
