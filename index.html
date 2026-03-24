@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hyein邀请函</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: "Arial", sans-serif;
+    background: radial-gradient(circle, #7b5cff, #3d2c8d);
+    overflow: hidden;
+}
+
+/* 波点背景 */
+body::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(rgba(255,255,255,0.2) 2px, transparent 2px);
+    background-size: 30px 30px;
+    z-index: 0;
+}
+
+/* 主卡片 */
+.card {
+    position: relative;
+    z-index: 1;
+    width: 90%;
+    max-width: 420px;
+    margin: 60px auto;
+    background: #fff;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    text-align: center;
+    transform: scale(0.8);
+    opacity: 0;
+    transition: 0.6s;
+}
+
+.card.show {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* 信件文字 */
+.letter {
+    text-align: left;
+    font-size: 15px;
+    line-height: 1.7;
+    color: #444;
+    white-space: pre-line;
+}
+
+/* 按钮 */
+.btn {
+    margin-top: 20px;
+    padding: 12px 20px;
+    border: none;
+    background: #7b5cff;
+    color: white;
+    border-radius: 20px;
+    font-size: 16px;
+}
+
+/* 图片 */
+.img {
+    width: 100%;
+    border-radius: 15px;
+    margin-bottom: 15px;
+}
+
+/* 标题 */
+.title {
+    font-size: 20px;
+    color: #7b5cff;
+    margin-bottom: 10px;
+}
+
+/* 小动画 */
+.fade {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: 0.6s;
+}
+
+.fade.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+</style>
+</head>
+
+<body>
+
+<div class="card" id="card">
+
+    <!-- 你的图片（替换src） -->
+    <img src="你的图片链接" class="img">
+
+    <div class="title">💜 Hyein Birthday Invitation 💜</div>
+
+    <div class="letter fade" id="text">
+To 亲爱的 Bunnies：
+
+안녕하세요~ 我是 Hyein！🐹  
+好久不见，大家最近过得好吗？  
+
+我最近过得超～级幸福，因为……  
+我的生日快到啦！  
+
+这一次，我想邀请我最爱的你们  
+和我一起度过这个特别的日子！  
+
+你愿意来吗？  
+我已经开始期待看到你们的笑容了！  
+
+如果没有办法来也没关系，  
+在远方为我送上祝福，  
+我也会超级感动的！  
+
+因为只要有 Bunnies 在，  
+每一天都像生日一样幸福～  
+
+💜 Dress Code：  
+请穿上带有紫色或波点元素的衣服哦～  
+我们一起搭配，拍超好看的照片！  
+
+那我们那天见啦！不见不散！  
+
+사랑해요, Bunnies! 🫶🏻  
+
+Yours,  
+Hyein
+    </div>
+
+    <button class="btn" onclick="showText()">💌 打开邀请函</button>
+
+</div>
+
+<script>
+window.onload = () => {
+    document.getElementById("card").classList.add("show");
+}
+
+function showText() {
+    document.getElementById("text").classList.add("show");
+}
+</script>
+
+</body>
+</html>
