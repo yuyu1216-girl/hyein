@@ -16,7 +16,40 @@ body {
     overflow: hidden;
     color: #333;
 }
+.letter-container {
+    display: flex;
+    justify-content: center;
+}
 
+.letter {
+    max-width: 300px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 20px 18px;
+    border-radius: 16px;
+
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+
+    font-family: 'Noto Serif', serif;
+    line-height: 1.9;
+    color: #444;
+    border: 1px solid #eee;
+}
+
+/* 段落更像信 */
+.letter p {
+    margin-bottom: 12px;
+    text-indent: 2em;
+}
+
+/* 第一行标题 */
+.letter p:first-child {
+    text-indent: 0;
+    text-align: center;
+    font-weight: 600;
+    color: #7b5cff;
+}
+    
 /* 页面结构 */
 .container {
     height: 100vh;
@@ -167,6 +200,7 @@ h2, h3 {
 <!-- 信件 -->
 <div class="page hidden bg">
     <div class="card">
+    <div class="letter-container">
         <div class="letter" id="letter"></div>
     </div>
 </div>
