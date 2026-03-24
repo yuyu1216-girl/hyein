@@ -9,14 +9,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&family=Noto+Serif+SC:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
+/* 彻底禁止微信字体放大 */
+html {
+    -webkit-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+    font-size: 16px;
+}
+body {
+    -webkit-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+    font-size: 1rem;
+}
+
 *{margin:0;padding:0;box-sizing:border-box;}
 
 body,input,button{
     font-family:'Playfair Display','Noto Serif SC',serif;
     overflow:hidden;
-    /* 防止微信强制放大字体 */
-    -webkit-text-size-adjust: 100%;
-    text-size-adjust: 100%;
 }
 
 /* 背景 */
@@ -24,7 +33,7 @@ body,input,button{
     position:fixed;
     width:100%;
     height:100vh;
-    background:#d9c6ea;
+    background:#d9c6ea url('./cover.jpg') center/cover no-repeat;
     filter:blur(20px);
     transform:scale(1.1);
 }
@@ -101,32 +110,33 @@ body,input,button{
 
 /* 标题 */
 .title{
-    font-size:64px;
+    font-size:3rem;      /* 64px 转为 rem */
     color:#caa6ff;
+    text-align:center;
 }
 
 /* 输入 */
 input{
-    padding:20px;
+    padding:1rem;
     border-radius:22px;
     border:none;
     width:80%;
     max-width:360px;
     text-align:center;
-    font-size:22px;
-    margin-top:24px;
+    font-size:1.2rem;
+    margin-top:1.5rem;
     background:rgba(255,255,255,0.7);
 }
 
 /* 按钮 */
 button{
-    margin-top:22px;
-    padding:16px 40px;
+    margin-top:1.4rem;
+    padding:1rem 2.5rem;
     border:none;
     background:rgba(200,160,255,0.7);
     color:#fff;
     border-radius:30px;
-    font-size:20px;
+    font-size:1.2rem;
     cursor:pointer;
     transition:0.3s;
 }
@@ -135,7 +145,7 @@ button:hover{
     box-shadow:0 0 15px rgba(180,120,255,0.6);
 }
 
-/* 信封 - 响应式宽度 */
+/* 信封 - 响应式 */
 .envelope{
     width:90%;
     max-width:360px;
@@ -152,7 +162,7 @@ button:hover{
     50%{transform:translateY(-10px);}
 }
 
-/* 三角盖（更明显） */
+/* 三角盖 */
 .flap{
     position:absolute;
     width:100%;
@@ -188,24 +198,27 @@ button:hover{
 
 /* 提示 */
 .hint{
-    margin-top:18px;
-    font-size:18px;
+    margin-top:1.2rem;
+    font-size:1rem;
     color:#8c5cff;
 }
 
-/* 信纸 */
+/* 信纸 - 防溢出 */
 .letter{
     width:92%;
     max-width:620px;
     background:rgba(255,255,255,0.7);
     border-radius:26px;
-    padding:34px;
-    font-size:22px;
+    padding:2rem;
+    font-size:1.1rem;
     line-height:2.4;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    box-sizing: border-box;
 }
 .letter p{
     text-indent:2em;
-    margin-bottom:14px;
+    margin-bottom:0.8rem;
 }
 .letter p:first-child{
     text-indent:0;
@@ -215,18 +228,18 @@ button:hover{
 .card{
     width:92%;
     max-width:520px;
-    padding:36px;
+    padding:2rem;
     background:rgba(255,255,255,0.6);
     border-radius:26px;
     text-align:center;
-    font-size:24px;
+    font-size:1.2rem;
     line-height:2.6;
 }
 
 /* 地图 */
 .map{
     display:inline-block;
-    padding:10px 22px;
+    padding:0.6rem 1.4rem;
     border-radius:20px;
     color:#8c5cff;
     cursor:pointer;
@@ -243,6 +256,24 @@ button:hover{
 @keyframes fly{
     to{transform:translateY(-150px);opacity:0;}
 }
+
+/* 移动端微调 */
+@media (max-width: 480px) {
+    html {
+        font-size: 14px;
+    }
+    .title {
+        font-size: 2.5rem;
+    }
+    .letter {
+        font-size: 1rem;
+        padding: 1.5rem;
+    }
+    .card {
+        font-size: 1rem;
+        padding: 1.5rem;
+    }
+}
 </style>
 </head>
 
@@ -255,7 +286,7 @@ button:hover{
 
 <!-- 封面 -->
 <div class="page active" id="p1" onclick="nextPage()">
-<img src="./cover.jpg" class="cover">
+<img src="./cover.jpg" class="cover" onerror="console.error('封面图加载失败，请检查 cover.jpg 是否存在且路径正确'); this.style.opacity=0;">
 </div>
 
 <!-- 输入 -->
@@ -357,7 +388,7 @@ h.style.top="60vh";
 document.body.appendChild(h);
 setTimeout(()=>h.remove(),1800);
 }
-alert("🍓 "+userName+" 我们4.18见！");
+alert("🍓"+userName+" 我们4.18见！");
 }
 </script>
 
