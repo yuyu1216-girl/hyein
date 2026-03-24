@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <title>Hyein Invitation</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display&family=Noto+Serif+SC&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display&family=Noto+Serif+SC:wght@400;600&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 
 body{
     overflow:hidden;
-    font-family:'Noto Serif SC',serif;
+    font-family:'Noto Serif SC','ZCOOL XiaoWei',serif;
 }
 
 /* 💜 背景 */
@@ -20,19 +20,15 @@ body{
     width:100%;
     height:100vh;
     background:#eadcff;
-    overflow:hidden;
-    filter: blur(0.3px) saturate(1.05);
 }
 
-/* 🌫️ 光雾（保留） */
+/* 🌫️ 光雾 */
 .bg::after{
     content:"";
     position:absolute;
     width:100%;
     height:100%;
-    background:
-    radial-gradient(circle at 50% 40%, rgba(255,255,255,0.45), transparent 70%),
-    radial-gradient(circle at 20% 80%, rgba(255,255,255,0.2), transparent 60%);
+    background:radial-gradient(circle at 50% 40%, rgba(255,255,255,0.4), transparent 70%);
     animation:glow 5s ease-in-out infinite alternate;
 }
 
@@ -41,12 +37,11 @@ body{
     to{opacity:0.7;}
 }
 
-/* 🌌 随机波点 */
+/* ✨ 波点发光（核心） */
 .dots{
     position:fixed;
     width:100%;
     height:100%;
-    overflow:hidden;
     pointer-events:none;
 }
 
@@ -54,14 +49,24 @@ body{
     position:absolute;
     border-radius:50%;
     background:white;
-    opacity:0.8;
-    filter:blur(0.5px);
-    animation:floatUp linear infinite;
+    opacity:0.6;
+    filter:blur(1px);
+
+    animation:twinkle 3s ease-in-out infinite alternate;
 }
 
-@keyframes floatUp{
-    from{transform:translateY(110vh);}
-    to{transform:translateY(-10vh);}
+/* 🌟 闪烁发光 */
+@keyframes twinkle{
+    0%{
+        opacity:0.4;
+        transform:scale(1);
+        box-shadow:0 0 10px rgba(255,255,255,0.3);
+    }
+    100%{
+        opacity:1;
+        transform:scale(1.4);
+        box-shadow:0 0 30px rgba(255,255,255,0.8);
+    }
 }
 
 /* 页面 */
@@ -75,22 +80,19 @@ body{
     flex-direction:column;
     opacity:0;
     pointer-events:none;
-    transition:0.7s;
-    transform:scale(1.05);
+    transition:0.6s;
 }
 
 .page.active{
     opacity:1;
     pointer-events:auto;
-    transform:scale(1);
 }
 
 /* 封面 */
 .cover{
-    width:100%;
+    width:92%;
     max-width:600px;
     border-radius:20px;
-    box-shadow:0 10px 40px rgba(0,0,0,0.2);
 }
 
 /* 输入 */
@@ -99,17 +101,11 @@ input{
     border-radius:16px;
     border:none;
     width:320px;
-    max-width:80%;
     text-align:center;
-    margin-top:24px;
-
     font-size:20px;
-    letter-spacing:1px;
-
-    box-shadow:0 8px 30px rgba(0,0,0,0.15);
-    outline:none;
 }
 
+/* 按钮 */
 button{
     margin-top:20px;
     padding:14px 36px;
@@ -117,23 +113,17 @@ button{
     background:#caa6ff;
     color:white;
     border-radius:30px;
-
     font-size:18px;
-    letter-spacing:1px;
-
-    box-shadow:0 8px 25px rgba(0,0,0,0.15);
+    cursor:pointer;
+    z-index:10;
 }
 
-/* 信封 */
+/* 💌 信封 */
 .envelope{
-    width:95%;
-    max-width:460px;
-    height:260px;
-    background:#fff;
-    border-radius:12px;
+    width:420px;
+    height:240px;
     position:relative;
     cursor:pointer;
-    perspective:1000px;
 }
 
 .flap{
@@ -143,58 +133,63 @@ button{
     background:#e6ccff;
     clip-path:polygon(0 0,100% 0,50% 60%);
     transform-origin:top;
-    transition:0.8s;
+    transition:0.6s;
+    z-index:2;
+}
+
+.body{
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:white;
+    border-radius:12px;
+    z-index:1;
 }
 
 .envelope.open .flap{
     transform:rotateX(180deg);
 }
 
-/* 信件（优化版） */
+/* 📄 信纸 */
 .letter{
-    width:95%;
+    width:92%;
     max-width:600px;
-    height:85vh;
-    background:white;
+    height:80vh;
+    background:linear-gradient(#ffffff,#f8f4ff);
     border-radius:20px;
-    padding:34px 26px;
-    box-shadow:0 15px 60px rgba(0,0,0,0.25);
+    padding:30px;
 
-    font-size:20px;
-    line-height:2.2;
-    letter-spacing:0.6px;
+    font-size:19px;
+    line-height:2.1;
 
-    display:flex;
-    flex-direction:column;
+    overflow-y:auto;
 
-    animation:floatCard 5s ease-in-out infinite alternate;
+    transform:translateY(60px) scale(0.95);
+    opacity:0;
+    transition:0.8s;
 }
 
-@keyframes floatCard{
-    from{transform:translateY(0);}
-    to{transform:translateY(-10px);}
+.letter.show{
+    transform:translateY(0) scale(1);
+    opacity:1;
 }
 
 /* 信息页 */
 .card{
     width:90%;
     max-width:520px;
-    height:auto;              /* ✅ 不再撑满屏 */
-    min-height:420px;         /* ✅ 保持卡片感 */
-
+    padding:30px;
     background:white;
     border-radius:20px;
-    padding:36px 28px;
-
     text-align:center;
-    box-shadow:0 15px 50px rgba(0,0,0,0.2);
-
     font-size:20px;
-    line-height:2.2;
+}
 
-    display:flex;
-    flex-direction:column;
-    justify-content:center;   /* ✅ 内容垂直居中 */
+/* 标题 */
+.title{
+    font-family:'Playfair Display',serif;
+    font-size:56px;
+    color:#caa6ff;
 }
 
 .map{
@@ -203,10 +198,16 @@ button{
     cursor:pointer;
 }
 
-.title{
-    font-family:'Playfair Display',serif;
-    font-size:56px;
-    color:#caa6ff;
+/* 💜 爱心 */
+.heart{
+    position:fixed;
+    font-size:20px;
+    animation:heartFly 2s ease-out forwards;
+}
+
+@keyframes heartFly{
+    0%{transform:translateY(0) scale(1);opacity:1;}
+    100%{transform:translateY(-150px) scale(1.8);opacity:0;}
 }
 </style>
 </head>
@@ -234,6 +235,7 @@ button{
 <div class="page" id="p3">
 <div class="envelope" onclick="openEnvelope(this)">
 <div class="flap"></div>
+<div class="body"></div>
 </div>
 <button onclick="nextPage()">打开信件</button>
 </div>
@@ -248,13 +250,9 @@ button{
 <div class="page" id="p5">
 <div class="card">
 💜 Happy Hyein's Day<br><br>
-
 📅 2026.04.18<br><br>
-
 📍 <span class="map" onclick="goMap()">广州 · 益+coffee&tea</span><br><br>
-
 Dress Code：紫色 / 波点<br><br>
-
 <button onclick="confirmAttend()">我要来！</button>
 </div>
 </div>
@@ -263,99 +261,88 @@ Dress Code：紫色 / 波点<br><br>
 let page=1;
 let userName="Bunnies";
 
-/* 翻页 */
 function nextPage(){
 document.getElementById("p"+page).classList.remove("active");
 page++;
-document.getElementById("p"+page).classList.add("active");
+let next=document.getElementById("p"+page);
+next.classList.add("active");
+
+if(page===4){
+setTimeout(()=>{
+document.querySelector(".letter").classList.add("show");
+},200);
+}
+
 updateLetter();
 }
 
-/* 进入 */
 function go(){
 let name=document.getElementById("name").value;
 if(name!=="") userName=name;
 
 let music=document.getElementById("music");
-music.volume=0.3;
+music.volume=0.4;
 music.play();
-
-let v=0.3;
-let fade=setInterval(()=>{
-if(v<1){v+=0.2;music.volume=v;}
-else clearInterval(fade);
-},100);
 
 nextPage();
 }
 
-/* 信封 */
 function openEnvelope(el){
 el.classList.toggle("open");
 }
 
-/* 信件（内容完全保留，只优化排版） */
 function updateLetter(){
 document.getElementById("letter").innerHTML = `
-<p style="margin-bottom:20px;">To 亲爱的 ${userName}：</p>
-<p style="margin-bottom:16px;">안녕하세요~ 我是Hyein！🐹</p>
-<p style="margin-bottom:16px;">
-好久不见，大家最近过得好吗？我最近过得超～级幸福，因为……我的生日快到啦！🎂✨
-</p>
-
-<p style="margin-bottom:16px;">
-这一次，我想邀请我最爱的你们和我一起度过这个特别的日子！你愿意来吗？我已经开始期待看到你们的笑容了！🥺💖
-如果没有办法来也没关系，只要为我送上祝福，我都会超级感动的！因为只要有Bunnies在，每一天都像生日一样幸福～
-</p>
-<p style="margin-bottom:16px;">
-别忘了：请穿上带有紫色或波点元素的衣服哦～我们一起拍超好看的照片！
-</p>
-<p style="margin-bottom:16px;">
-那我们那天见啦！不见不散！
-</p>
-<p style="margin-bottom:20px;">
-사랑해요, Bunnies! 🫶🏻
-</p>
-<p style="text-align:right;margin-top:auto;">
-Yours,<br>Hyein
-</p>
+<p>To 亲爱的 ${userName}：</p>
+<p>안녕하세요~ 我是Hyein！🐹</p>
+<p>好久不见，大家最近过得好吗？我最近过得超～级幸福，因为……我的生日快到啦！🎂✨</p>
+<p>这一次，我想邀请我最爱的你们和我一起度过这个特别的日子！你愿意来吗？我已经开始期待看到你们的笑容了！🥺💖</p>
+<p>如果没有办法来也没关系，只要为我送上祝福，我都会超级感动的！因为只要有Bunnies在，每一天都像生日一样幸福～</p>
+<p>别忘了：请穿上带有紫色或波点元素的衣服哦～我们一起拍超好看的照片！</p>
+<p>那我们那天见啦！不见不散！</p>
+<p>사랑해요, Bunnies! 🫶🏻</p>
+<p style="text-align:right;">Yours,<br>Hyein</p>
 `;
 }
 
-/* 地图 */
 function goMap(){
 window.open("https://surl.amap.com/cYD2lgm1A9q1");
 }
 
-/* 弹窗 */
 function confirmAttend(){
 alert("💜 "+userName+" 我们4.18见！");
+
+for(let i=0;i<12;i++){
+let h=document.createElement("div");
+h.className="heart";
+h.innerHTML="💜";
+h.style.left=Math.random()*100+"%";
+h.style.top="60%";
+document.body.appendChild(h);
+setTimeout(()=>h.remove(),2000);
+}
 }
 
-/* 🌌 生成随机波点 */
+/* ✨ 生成发光波点 */
 function createDots(){
-const container=document.querySelector(".dots");
+const c=document.querySelector(".dots");
 
-for(let i=0;i<70;i++){
-let dot=document.createElement("div");
-dot.className="dot";
+for(let i=0;i<50;i++){
+let d=document.createElement("div");
+d.className="dot";
 
-let size=Math.random()*18+10;
-dot.style.width=size+"px";
-dot.style.height=size+"px";
+let s=Math.random()*20+10;
+d.style.width=s+"px";
+d.style.height=s+"px";
 
-dot.style.left=Math.random()*100+"%";
-dot.style.top=Math.random()*100+"%";
+d.style.left=Math.random()*100+"%";
+d.style.top=Math.random()*100+"%";
 
-dot.style.opacity=Math.random()*0.5+0.4;
+d.style.animationDuration=(Math.random()*2+2)+"s";
 
-let duration=Math.random()*8+8;
-dot.style.animationDuration=duration+"s";
-
-container.appendChild(dot);
+c.appendChild(d);
 }
 }
-
 createDots();
 </script>
 
