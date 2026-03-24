@@ -87,7 +87,7 @@ body{
 
 /* 封面 */
 .cover{
-    width:95%;
+    width:100%;
     max-width:600px;
     border-radius:20px;
     box-shadow:0 10px 40px rgba(0,0,0,0.2);
@@ -177,16 +177,24 @@ button{
 
 /* 信息页 */
 .card{
-    width:65%;
-    max-width:600px;
-    height:85vh;
+    width:90%;
+    max-width:520px;
+    height:auto;              /* ✅ 不再撑满屏 */
+    min-height:420px;         /* ✅ 保持卡片感 */
+
     background:white;
-    border-radius:18px;
-    padding:30px;
+    border-radius:20px;
+    padding:36px 28px;
+
     text-align:center;
-    box-shadow:0 10px 40px rgba(0,0,0,0.2);
-    font-size:22px;
-    line-height:2;
+    box-shadow:0 15px 50px rgba(0,0,0,0.2);
+
+    font-size:20px;
+    line-height:2.2;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;   /* ✅ 内容垂直居中 */
 }
 
 .map{
@@ -290,37 +298,24 @@ el.classList.toggle("open");
 function updateLetter(){
 document.getElementById("letter").innerHTML = `
 <p style="margin-bottom:20px;">To 亲爱的 ${userName}：</p>
-
 <p style="margin-bottom:16px;">안녕하세요~ 我是Hyein！🐹</p>
-
 <p style="margin-bottom:16px;">
 好久不见，大家最近过得好吗？我最近过得超～级幸福，因为……我的生日快到啦！🎂✨
 </p>
 
 <p style="margin-bottom:16px;">
-这一次，我想邀请我最爱的你们和我一起度过这个特别的日子！
-</p>
-
-<p style="margin-bottom:16px;">
-你愿意来吗？我已经开始期待看到你们的笑容了！🥺💖
-</p>
-
-<p style="margin-bottom:16px;">
+这一次，我想邀请我最爱的你们和我一起度过这个特别的日子！你愿意来吗？我已经开始期待看到你们的笑容了！🥺💖
 如果没有办法来也没关系，只要为我送上祝福，我都会超级感动的！因为只要有Bunnies在，每一天都像生日一样幸福～
 </p>
-
 <p style="margin-bottom:16px;">
 别忘了：请穿上带有紫色或波点元素的衣服哦～我们一起拍超好看的照片！
 </p>
-
 <p style="margin-bottom:16px;">
 那我们那天见啦！不见不散！
 </p>
-
 <p style="margin-bottom:20px;">
 사랑해요, Bunnies! 🫶🏻
 </p>
-
 <p style="text-align:right;margin-top:auto;">
 Yours,<br>Hyein
 </p>
@@ -345,7 +340,7 @@ for(let i=0;i<70;i++){
 let dot=document.createElement("div");
 dot.className="dot";
 
-let size=Math.random()*14+6;
+let size=Math.random()*18+10;
 dot.style.width=size+"px";
 dot.style.height=size+"px";
 
