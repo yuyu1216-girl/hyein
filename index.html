@@ -13,7 +13,7 @@ body{
     margin:0;
     overflow:hidden;
     font-family:'Noto Serif SC',serif;
-    background:#e8dbff;
+    background:#e6dbff;
 }
 
 /* 🌫️ 雾 */
@@ -22,9 +22,13 @@ body::before{
     position:fixed;
     width:100%;
     height:100%;
-    background:radial-gradient(circle at 50% 30%, #ffffff55, transparent 60%);
-    filter:blur(40px);
-    pointer-events:none;
+    background:radial-gradient(circle at 60% 30%, #ffffff88, transparent 60%);
+    filter:blur(80px);
+    animation:fog 10s ease-in-out infinite alternate;
+}
+@keyframes fog{
+    from{transform:translateY(-20px);}
+    to{transform:translateY(20px);}
 }
 
 /* ✨ 光 */
@@ -33,29 +37,31 @@ body::after{
     position:fixed;
     width:100%;
     height:100%;
-    background:linear-gradient(180deg,#ffffff20,#ffffff05);
-    pointer-events:none;
+    background:linear-gradient(180deg,#ffffff30,#ffffff05);
+    animation:light 6s infinite alternate;
+}
+@keyframes light{
+    from{opacity:0.6;}
+    to{opacity:1;}
 }
 
-/* 💜 波点 */
+/* 💜 波点（大颗梦核） */
 .bg{
-    background:#e8dbff;
+    background:#e6dbff;
     position:relative;
 }
-
 .bg::after{
     content:"";
     position:absolute;
     width:200%;
     height:200%;
-    background:radial-gradient(circle,#ffffff40 8px,transparent 8px);
-    background-size:120px 120px;
-    animation:move 25s linear infinite;
+    background:radial-gradient(circle,#ffffff55 18px,transparent 18px);
+    background-size:160px 160px;
+    animation:floatDots 40s linear infinite;
 }
-
-@keyframes move{
-    from{transform:translateY(0)}
-    to{transform:translateY(-200px)}
+@keyframes floatDots{
+    from{transform:translateY(0);}
+    to{transform:translateY(-300px);}
 }
 
 /* 页面 */
@@ -69,23 +75,23 @@ body::after{
     flex-direction:column;
     transition:0.8s;
 }
-
 .hidden{
     transform:translateY(100%);
 }
 
-/* 卡片 */
+/* 卡片（信纸感） */
 .card{
-    width:92%;
-    max-width:560px;
-    background:rgba(255,255,255,0.65);
-    backdrop-filter:blur(20px);
-    border-radius:26px;
-    padding:34px;
-    box-shadow:0 0 80px rgba(160,120,255,0.25);
+    width:94%;
+    max-width:700px;
+    min-height:60vh;
+    background:rgba(255,255,255,0.55);
+    backdrop-filter:blur(25px);
+    border-radius:30px;
+    padding:40px 36px;
+    box-shadow:0 0 120px rgba(180,150,255,0.25);
 }
 
-/* 输入框 */
+/* 输入 */
 .input{
     padding:12px;
     border-radius:20px;
@@ -114,18 +120,17 @@ body::after{
 
 /* 信封 */
 .envelope{
-    width:360px;
-    height:230px;
+    width:420px;
+    height:260px;
     background:white;
-    border-radius:18px;
-    cursor:pointer;
+    border-radius:20px;
     position:relative;
+    cursor:pointer;
     animation:glow 3s infinite alternate;
 }
-
 @keyframes glow{
-    from{box-shadow:0 0 30px rgba(140,100,255,0.2);}
-    to{box-shadow:0 0 80px rgba(200,160,255,0.5);}
+    from{box-shadow:0 0 40px rgba(160,120,255,0.2);}
+    to{box-shadow:0 0 120px rgba(200,160,255,0.6);}
 }
 
 .flap{
@@ -135,31 +140,26 @@ body::after{
     background:#d8c5ff;
     clip-path:polygon(0 0,100% 0,50% 65%);
     transform-origin:top;
-    transition:0.8s;
+    transition:1s;
 }
-
 .open .flap{
     transform:rotateX(180deg);
 }
 
 /* 信件 */
 .letter{
-    font-size:17px;
+    font-size:18px;
     line-height:2.2;
     color:#3f2b7a;
-    text-align:left;
 }
-
 .letter p{
     text-indent:2em;
     margin:12px 0;
 }
-
 .letter p:first-child{
     text-indent:0;
     font-weight:600;
 }
-
 .signature{
     text-align:right;
 }
@@ -174,16 +174,13 @@ body::after{
     justify-content:center;
     align-items:center;
 }
-
 .popupBox{
-    background:rgba(255,255,255,0.8);
-    backdrop-filter:blur(20px);
+    background:rgba(255,255,255,0.75);
+    backdrop-filter:blur(25px);
     padding:30px;
     border-radius:20px;
     text-align:center;
     color:#5a3fd1;
-    width:70%;
-    max-width:300px;
 }
 </style>
 </head>
@@ -195,9 +192,9 @@ body::after{
 <!-- 输入 -->
 <div class="page bg" id="page0">
     <div class="card" style="text-align:center;">
-        <h3 style="color:#6d52d9;">💜 Bunnies Invitation 💜</h3>
+        <h3>💜 Bunnies Invitation 💜</h3>
         <input class="input" id="nameInput" placeholder="请输入你的名字">
-        <button class="btn" onclick="start()">进入邀请函</button>
+        <button class="btn" onclick="start()">进入</button>
     </div>
 </div>
 
@@ -240,7 +237,7 @@ body::after{
 <div id="popup">
     <div class="popupBox">
         💜 <span id="popupText"></span><br><br>
-        <button class="btn" onclick="closePopup()">好的！</button>
+        <button class="btn" onclick="closePopup()">好的</button>
     </div>
 </div>
 
@@ -248,7 +245,7 @@ body::after{
 let current=0;
 let userName="Bunnies";
 
-/* 音乐 */
+/* 音乐淡入 */
 function playMusic(){
     let a=document.getElementById("music");
     a.volume=0;
@@ -272,7 +269,7 @@ function nextPage(){
     document.getElementById("page"+current).classList.add("hidden");
     current++;
     document.getElementById("page"+current).classList.remove("hidden");
-    if(current===3){updateLetter();}
+    if(current===3){typeLetter();}
 }
 
 /* 信封 */
@@ -280,32 +277,52 @@ function openEnvelope(){
     document.getElementById("env").classList.add("open");
     document.body.style.background="#fff";
     setTimeout(()=>{
-        document.body.style.background="#e8dbff";
+        document.body.style.background="#e6dbff";
         nextPage();
     },400);
 }
 
-/* 信件 */
-function updateLetter(){
-document.getElementById("letter").innerHTML=`
-<p>To 亲爱的 ${userName}：</p>
-<p>안녕하세요~ 我是Hyein！🐹</p>
-<p>好久不见，大家最近过得好吗？我最近过得超～级幸福，因为……我的生日快到啦！</p>
-<p>这一次，我想邀请我最爱的你们和我一起度过这个特别的日子！</p>
-<p>你愿意来吗？我已经开始期待看到你们的笑容了！如果没有办法来也没关系，在远方为我送上祝福，我也会超级感动的！因为只要有Bunnies在，每一天都像生日一样幸福～</p>
-<p>别忘了：请穿上带有紫色或波点元素的衣服哦～我们一起搭配，拍超好看的照片！</p>
-<p>那我们那天见啦！不见不散！</p>
-<p>사랑해요, Bunnies! 🫶🏻</p>
-<p class="signature">Yours,<br>Hyein</p>
-`;
+/* 打字效果 */
+function typeLetter(){
+let text=`To 亲爱的 ${userName}：
+
+안녕하세요~ 我是Hyein！🐹
+
+好久不见，大家最近过得好吗？我最近过得超～级幸福，因为……我的生日快到啦！
+
+这一次，我想邀请我最爱的你们和我一起度过这个特别的日子！
+
+你愿意来吗？我已经开始期待看到你们的笑容了！如果没有办法来也没关系，在远方为我送上祝福，我也会超级感动的！因为只要有Bunnies在，每一天都像生日一样幸福～
+
+别忘了：请穿上带有紫色或波点元素的衣服哦～我们一起搭配，拍超好看的照片！
+
+那我们那天见啦！不见不散！
+
+사랑해요, Bunnies! 🫶🏻
+
+Yours,
+Hyein`;
+
+let i=0;
+let speed=30;
+let box=document.getElementById("letter");
+box.innerHTML="";
+
+function typing(){
+    if(i<text.length){
+        box.innerHTML+=text.charAt(i);
+        i++;
+        setTimeout(typing,speed);
+    }
+}
+typing();
 }
 
 /* 弹窗 */
 function showPopup(){
-    document.getElementById("popupText").innerText=userName+"，我们4.18广州见！💜";
+    document.getElementById("popupText").innerText=userName+"，我们4.18广州见 💜";
     document.getElementById("popup").style.display="flex";
 }
-
 function closePopup(){
     document.getElementById("popup").style.display="none";
 }
