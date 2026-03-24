@@ -4,25 +4,25 @@
 <meta charset="UTF-8">
 <title>Hyein Invitation</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,500&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,500&family=Noto+Serif+SC:wght@300;400&display=swap" rel="stylesheet">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 
-body{
+body, input, button{
+    font-family:'Playfair Display','Noto Serif SC',serif;
     overflow:hidden;
-    font-family:'Noto Serif SC','Playfair Display',serif;
 }
 
-/* 💜 背景 */
+/* 背景 */
 .bg{
     position:fixed;
     width:100%;
     height:100vh;
-    background:#d7c3eb;
+    background:#d4bde6;
 }
 
-/* 🌫️ 光雾 */
+/* 光雾 */
 .bg::after{
     content:"";
     position:absolute;
@@ -31,41 +31,37 @@ body{
     background:radial-gradient(circle at 50% 40%, rgba(255,255,255,0.3), transparent 70%);
 }
 
-/* ✨ 梦核波点（错位+呼吸） */
+/* 波点 */
 .dots{
     position:fixed;
     width:100%;
     height:100%;
     pointer-events:none;
-    overflow:hidden;
 }
 
-/* 第一层 */
 .dots::before{
     content:"";
     position:absolute;
     width:200%;
     height:200%;
-    background-image:
-    radial-gradient(circle, rgba(255,255,255,0.95) 7px, transparent 8px);
-    background-size:70px 70px;
+    background:
+    radial-gradient(circle, rgba(255,255,255,0.9) 7px, transparent 8px);
+    background-size:75px 75px;
     animation:breath1 4s ease-in-out infinite alternate;
 }
 
-/* 第二层（错位） */
 .dots::after{
     content:"";
     position:absolute;
     width:200%;
     height:200%;
     transform:translate(35px,35px);
-    background-image:
-    radial-gradient(circle, rgba(255,255,255,0.85) 6px, transparent 7px);
-    background-size:70px 70px;
+    background:
+    radial-gradient(circle, rgba(255,255,255,0.8) 6px, transparent 7px);
+    background-size:75px 75px;
     animation:breath2 5s ease-in-out infinite alternate;
 }
 
-/* 呼吸动画 */
 @keyframes breath1{
     from{opacity:0.5;filter:blur(0px);}
     to{opacity:1;filter:blur(2px);}
@@ -97,6 +93,13 @@ body{
     border-radius:20px;
 }
 
+/* 标题 */
+.title{
+    font-size:58px;
+    color:#caa6ff;
+    letter-spacing:2px;
+}
+
 /* 输入 */
 input{
     padding:18px;
@@ -106,28 +109,34 @@ input{
     text-align:center;
     font-size:20px;
     margin-top:20px;
+    background:rgba(255,255,255,0.6);
+    backdrop-filter:blur(6px);
 }
 
+/* 按钮 */
 button{
     margin-top:20px;
-    padding:12px 32px;
+    padding:12px 34px;
     border:none;
-    background:#caa6ff;
-    color:white;
+    background:rgba(200,160,255,0.6);
+    backdrop-filter:blur(6px);
+    color:#fff;
     border-radius:30px;
+    font-size:16px;
+    letter-spacing:1px;
     cursor:pointer;
+    transition:0.3s;
 }
-
-/* 标题 */
-.title{
-    font-family:'Playfair Display',serif;
-    font-size:60px;
-    color:#caa6ff;
+button:hover{
+    transform:scale(1.05);
+    box-shadow:0 0 15px rgba(180,120,255,0.6);
 }
 
 /* 信封 */
 .envelope{
-    width:420px;height:240px;position:relative;cursor:pointer;
+    width:420px;height:240px;
+    position:relative;
+    cursor:pointer;
 }
 .flap{
     position:absolute;width:100%;height:100%;
@@ -151,12 +160,9 @@ button{
     backdrop-filter:blur(12px);
     border-radius:20px;
     padding:30px;
-
     font-size:20px;
     line-height:2.2;
-
     overflow-y:auto;
-
     opacity:0;
     transform:translateY(40px);
     transition:0.8s;
@@ -166,52 +172,22 @@ button{
     transform:none;
 }
 
-/* 卡片（自适应） */
+/* 卡片 */
 .card{
     width:88%;
     max-width:480px;
     padding:28px;
-
     background:rgba(255,255,255,0.55);
     backdrop-filter:blur(18px);
-
     border-radius:22px;
-
     border:1px solid rgba(255,255,255,0.4);
-
-    box-shadow:
-    0 10px 40px rgba(0,0,0,0.15),
-    inset 0 1px 1px rgba(255,255,255,0.6);
-
+    box-shadow:0 10px 40px rgba(0,0,0,0.15);
     text-align:center;
     font-size:19px;
     line-height:2;
-
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-
-    position:relative;
-    transition:0.4s;
 }
 
-/* 流光边 */
-.card::before{
-    content:"";
-    position:absolute;
-    inset:-1px;
-    border-radius:22px;
-    background:linear-gradient(120deg,transparent,rgba(180,120,255,0.4),transparent);
-    opacity:0.4;
-}
-
-/* hover */
-.card:hover{
-    transform:scale(1.03);
-    box-shadow:0 15px 50px rgba(180,120,255,0.4);
-}
-
-/* 地图按钮 */
+/* 地图 */
 .map{
     display:inline-block;
     padding:8px 18px;
@@ -219,7 +195,6 @@ button{
     background:rgba(180,120,255,0.2);
     color:#8c5cff;
     cursor:pointer;
-    transition:0.3s;
 }
 .map:hover{
     box-shadow:0 0 15px rgba(180,120,255,0.6);
@@ -241,6 +216,8 @@ button{
 
 <div class="bg"></div>
 <div class="dots"></div>
+
+<audio id="music" src="music.mp3" loop></audio>
 
 <!-- 封面 -->
 <div class="page active" id="p1" onclick="nextPage()">
@@ -270,8 +247,8 @@ button{
 <!-- 信息 -->
 <div class="page" id="p5">
 <div class="card">
-💜 Happy Hyein's Day💜<br>
-📅 2026.04.18 <br>
+💜 Happy Hyein's Day 💜<br>
+📅 2026.04.18<br>
 📍 <span class="map" onclick="goMap()">益+coffee&tea</span><br>
 Dress Code：紫色 / 波点<br>
 <button onclick="confirmAttend()">我要来！</button>
@@ -282,8 +259,16 @@ Dress Code：紫色 / 波点<br>
 let page=1;
 let userName="Bunnies";
 let opened=false;
+let musicStarted=false;
 
 function nextPage(){
+if(!musicStarted){
+let music=document.getElementById("music");
+music.volume=0.4;
+music.play().catch(()=>{});
+musicStarted=true;
+}
+
 document.getElementById("p"+page).classList.remove("active");
 page++;
 document.getElementById("p"+page).classList.add("active");
@@ -305,7 +290,7 @@ if(!opened){
 el.classList.add("open");
 opened=true;
 }else{
-nextPage();
+setTimeout(()=>nextPage(),200);
 }
 }
 
@@ -331,7 +316,7 @@ function confirmAttend(){
 for(let i=0;i<12;i++){
 let h=document.createElement("div");
 h.className="heart";
-h.innerHTML="🍓";
+h.innerHTML="💖";
 h.style.left=Math.random()*100+"vw";
 h.style.top="60vh";
 document.body.appendChild(h);
@@ -339,6 +324,31 @@ setTimeout(()=>h.remove(),1800);
 }
 alert("💜 "+userName+" 我们4.18见！");
 }
+
+/* 💭 梦核记忆碎片 */
+const words=["dream","remember","04.18","Hyein","bunnies","NewJeans","2008","18"];
+
+setInterval(()=>{
+let t=document.createElement("div");
+
+t.innerText=words[Math.floor(Math.random()*words.length)];
+t.style.position="fixed";
+t.style.left=Math.random()*90+"vw";
+t.style.top=Math.random()*90+"vh";
+
+t.style.fontSize=(14+Math.random()*10)+"px";
+t.style.opacity="0";
+t.style.color="rgba(255,255,255,0.5)";
+t.style.pointerEvents="none";
+t.style.transition="opacity 1s ease";
+
+document.body.appendChild(t);
+
+setTimeout(()=>t.style.opacity="0.35",50);
+setTimeout(()=>t.style.opacity="0",1200);
+setTimeout(()=>t.remove(),2000);
+
+},3000);
 </script>
 
 </body>
