@@ -2,9 +2,13 @@
 <html lang="zh">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Hyein Invitation</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,500&family=Noto+Serif+SC:wght@300;400&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="cover.jpg">
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display&family=Noto+Serif+SC:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -14,56 +18,21 @@ body,input,button{
     overflow:hidden;
 }
 
-/* 背景（香芋紫） */
+/* 背景 */
 .bg{
     position:fixed;
     width:100%;
     height:100vh;
-    background:#d9c6ea;
+    background:#d9c6ea url('cover.jpg') center/cover no-repeat;
+    filter:blur(20px);
+    transform:scale(1.1);
 }
 .bg::after{
     content:"";
     position:absolute;
     width:100%;
     height:100%;
-    background:radial-gradient(circle at 50% 40%, rgba(255,255,255,0.3), transparent 70%);
-}
-
-/* 波点 */
-.dots{
-    position:fixed;
-    width:100%;
-    height:100%;
-    pointer-events:none;
-}
-.dots::before{
-    content:"";
-    position:absolute;
-    width:200%;
-    height:200%;
-    background:
-    radial-gradient(circle, rgba(255,255,255,0.95) 9px, transparent 10px);
-    background-size:80px 80px;
-    animation:breath1 5s ease-in-out infinite alternate;
-}
-.dots::after{
-    content:"";
-    position:absolute;
-    width:200%;
-    height:200%;
-    transform:translate(40px,40px);
-    background:
-    radial-gradient(circle, rgba(255,255,255,0.85) 8px, transparent 9px);
-    background-size:80px 80px;
-    animation:breath2 6s ease-in-out infinite alternate;
-}
-@keyframes breath1{
-    from{opacity:0.5;}
-    to{opacity:1;}
-}
-@keyframes breath2{
-    from{opacity:0.3;}
-    to{opacity:0.9;}
+    background:rgba(217,198,234,0.6);
 }
 
 /* 页面 */
@@ -82,97 +51,120 @@ body,input,button{
 }
 .page.active{opacity:1;pointer-events:auto;}
 
-/* 封面（微信适配） */
+/* 封面 */
 .cover{
-    width:92%;
-    max-width:600px;
-    border-radius:20px;
+    width:90%;
+    max-width:640px;
+    border-radius:22px;
+    opacity:0;
+    transition:opacity 1s;
 }
+.cover.loaded{opacity:1;}
 
 /* 标题 */
 .title{
-    font-size:56px;
+    font-size:clamp(42px,6vw,64px);
     color:#caa6ff;
 }
 
 /* 输入 */
 input{
     padding:18px;
-    border-radius:20px;
+    border-radius:22px;
     border:none;
-    width:320px;
+    width:80%;
+    max-width:360px;
     text-align:center;
-    font-size:20px;
-    margin-top:20px;
-    background:rgba(255,255,255,0.6);
+    font-size:clamp(18px,4vw,22px);
+    margin-top:24px;
+    background:rgba(255,255,255,0.7);
 }
 
 /* 按钮 */
 button{
-    margin-top:20px;
+    margin-top:22px;
     padding:14px 36px;
     border:none;
-    background:rgba(200,160,255,0.6);
+    background:rgba(200,160,255,0.7);
     color:#fff;
     border-radius:30px;
+    font-size:clamp(16px,3.8vw,20px);
     cursor:pointer;
     transition:0.3s;
-    font-size:18px;
 }
 button:hover{
     transform:scale(1.05);
     box-shadow:0 0 15px rgba(180,120,255,0.6);
 }
 
-/* 信封（更真实） */
+/* ✉️ 信封 */
 .envelope{
-    width:420px;
-    height:240px;
+    width:clamp(260px,80vw,380px);
+    height:clamp(160px,45vw,240px);
     position:relative;
     cursor:pointer;
-    border-radius:14px;
-    border:1px solid rgba(200,160,255,0.4);
+    border-radius:12px;
+    background:#fff;
+    box-shadow:0 10px 25px rgba(0,0,0,0.15);
+    animation:float 3s ease-in-out infinite;
 }
 
-/* 紫色三角盖 */
+@keyframes float{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-10px);}
+}
+
+/* 三角盖 */
 .flap{
     position:absolute;
     width:100%;
     height:100%;
-    background:linear-gradient(135deg,#caa6ff,#e2c6ff);
-    clip-path:polygon(0 0,100% 0,50% 70%);
+    background:#eee;
+    clip-path:polygon(0 0,100% 0,50% 88%);
     transform-origin:top;
     transition:0.5s;
-    box-shadow:0 4px 12px rgba(150,100,255,0.3);
 }
-
 .envelope.open .flap{
     transform:rotateX(180deg);
 }
 
-/* 信封身体 */
+/* 主体 */
 .body{
     position:absolute;
     width:100%;
     height:100%;
-    background:white;
-    border-radius:14px;
-    box-shadow:0 8px 20px rgba(0,0,0,0.1);
+    background:#fff;
+    border-radius:12px;
 }
 
-/* 信纸（不滚动 + 优雅排版） */
+/* 折痕 */
+.body::after{
+    content:"";
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:
+    linear-gradient(135deg, transparent 49%, rgba(0,0,0,0.1) 50%, transparent 51%),
+    linear-gradient(225deg, transparent 49%, rgba(0,0,0,0.1) 50%, transparent 51%);
+}
+
+/* 提示 */
+.hint{
+    margin-top:16px;
+    font-size:clamp(14px,3.5vw,18px);
+    color:#8c5cff;
+}
+
+/* 信纸 */
 .letter{
     width:92%;
-    max-width:600px;
-    background:rgba(255,255,255,0.65);
-    backdrop-filter:blur(12px);
+    max-width:640px;
+    background:rgba(255,255,255,0.75);
     border-radius:24px;
-    padding:30px;
-    font-size:20px;
+    padding:clamp(22px,5vw,34px);
+    font-size:clamp(16px,4.2vw,22px);
     line-height:2.3;
 }
-
-/* 段落排版 */
 .letter p{
     text-indent:2em;
     margin-bottom:12px;
@@ -183,25 +175,23 @@ button:hover{
 
 /* 卡片 */
 .card{
-    width:90%;
+    width:92%;
     max-width:520px;
-    padding:32px;
-    background:rgba(255,255,255,0.55);
-    backdrop-filter:blur(18px);
+    padding:clamp(24px,6vw,36px);
+    background:rgba(255,255,255,0.65);
     border-radius:24px;
     text-align:center;
-    font-size:22px;
-    line-height:2.4;
+    font-size:clamp(18px,4.5vw,24px);
+    line-height:2.5;
 }
 
-/* 地图按钮 */
+/* 地图 */
 .map{
     display:inline-block;
-    padding:10px 22px;
+    padding:8px 18px;
     border-radius:20px;
     color:#8c5cff;
     cursor:pointer;
-    transition:0.3s;
 }
 .map:hover{
     box-shadow:0 0 15px rgba(180,120,255,0.6);
@@ -210,7 +200,7 @@ button:hover{
 /* 爱心 */
 .heart{
     position:fixed;
-    animation:fly 1.8s ease-out forwards;
+    animation:fly 1.8s forwards;
 }
 @keyframes fly{
     to{transform:translateY(-150px);opacity:0;}
@@ -221,7 +211,6 @@ button:hover{
 <body>
 
 <div class="bg"></div>
-<div class="dots"></div>
 
 <audio id="music" src="music.mp3" loop></audio>
 
@@ -243,6 +232,7 @@ button:hover{
 <div class="flap"></div>
 <div class="body"></div>
 </div>
+<div class="hint">Tap to open 💌</div>
 </div>
 
 <!-- 信件 -->
@@ -267,6 +257,10 @@ let userName="Bunnies";
 let opened=false;
 let musicStarted=false;
 
+window.onload=function(){
+document.querySelector(".cover").classList.add("loaded");
+};
+
 function nextPage(){
 if(!musicStarted){
 let music=document.getElementById("music");
@@ -274,11 +268,9 @@ music.volume=0.4;
 music.play().catch(()=>{});
 musicStarted=true;
 }
-
 document.getElementById("p"+page).classList.remove("active");
 page++;
 document.getElementById("p"+page).classList.add("active");
-
 updateLetter();
 }
 
@@ -325,7 +317,7 @@ h.style.top="60vh";
 document.body.appendChild(h);
 setTimeout(()=>h.remove(),1800);
 }
-alert("🍓 "+userName+" 4.18见！");
+alert("💜 "+userName+" 我们4.18见！");
 }
 </script>
 
