@@ -39,36 +39,38 @@ body {
     box-sizing: border-box;
 }
 
-/* 背景层（雾效初始模糊+缩放） */
+/* 背景层 - 默认纯色香芋紫 */
 .bg {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100vh;
-    background: #d9c6ea url('./cover.jpg') center/cover no-repeat;
-    filter: blur(20px);
-    transform: scale(1.1);
+    background: #e2d5f0; /* 低饱和香芋紫 */
     transition: filter 0.9s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.9s ease-out;
     z-index: 0;
-    /* 背景图片加载前显示底色，避免白屏 */
-    background-color: #d9c6ea;
 }
-.bg::after {
+/* 封面模式：显示图片 + 模糊 + 缩放 */
+.bg.cover-mode {
+    background: #e2d5f0 url('./cover.jpg') center/cover no-repeat;
+    filter: blur(20px);
+    transform: scale(1.1);
+}
+.bg.cover-mode::after {
     content: "";
     position: absolute;
     width: 100%;
     height: 100%;
-    background: rgba(217, 198, 234, 0.65);
+    background: rgba(226, 213, 240, 0.65);
     transition: opacity 0.9s ease-out;
     opacity: 1;
 }
-/* 雾层散开后的清晰状态（由js动态添加类） */
-.bg.clear {
+/* 雾层散开（仅封面模式生效） */
+.bg.cover-mode.clear {
     filter: blur(0px);
     transform: scale(1);
 }
-.bg.clear::after {
+.bg.cover-mode.clear::after {
     opacity: 0;
 }
 
@@ -85,7 +87,7 @@ body {
     position: absolute;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.92) 10px, transparent 11px);
+    background: radial-gradient(circle, rgba(255,255,240,0.85) 10px, transparent 11px);
     background-size: 85px 85px;
     animation: breath1 5s ease-in-out infinite alternate;
 }
@@ -95,7 +97,7 @@ body {
     width: 200%;
     height: 200%;
     transform: translate(42px, 42px);
-    background: radial-gradient(circle, rgba(255,255,240,0.8) 9px, transparent 10px);
+    background: radial-gradient(circle, rgba(255,250,220,0.7) 9px, transparent 10px);
     background-size: 85px 85px;
     animation: breath2 6s ease-in-out infinite alternate;
 }
@@ -134,13 +136,12 @@ body {
     width: 92%;
     max-width: 640px;
     border-radius: 32px;
-    box-shadow: 0 25px 40px rgba(0,0,0,0.2);
+    box-shadow: 0 25px 40px rgba(0,0,0,0.15);
     cursor: pointer;
     transition: transform 0.3s ease, opacity 0.6s ease;
     will-change: transform, opacity;
     opacity: 0;
     transform: scale(0.98);
-    /* 初始透明，加载完成后由 JS 触发显示动画 */
 }
 .cover.loaded {
     opacity: 1;
@@ -158,8 +159,8 @@ body {
 /* 标题 */
 .title {
     font-size: 3rem;
-    color: #a97cff;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    color: #b198cf; /* 低饱和淡紫 */
+    text-shadow: 0 2px 8px rgba(0,0,0,0.08);
     letter-spacing: 2px;
     margin-bottom: 0.5rem;
     text-align: center;
@@ -174,15 +175,15 @@ body {
     max-width: 340px;
     text-align: center;
     font-size: 1.2rem;
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(245, 240, 255, 0.85);
     backdrop-filter: blur(4px);
     font-family: inherit;
-    box-shadow: 0 5px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.08);
 }
 .input-name:focus {
     outline: none;
     background: white;
-    box-shadow: 0 0 0 3px rgba(169,124,255,0.4);
+    box-shadow: 0 0 0 3px rgba(177, 152, 207, 0.4);
 }
 
 /* 按钮 */
@@ -190,7 +191,7 @@ body {
     margin-top: 1.5rem;
     padding: 0.8rem 2.2rem;
     border: none;
-    background: rgba(169, 124, 255, 0.85);
+    background: rgba(170, 140, 210, 0.85);
     color: white;
     border-radius: 60px;
     font-size: 1.2rem;
@@ -198,12 +199,12 @@ body {
     cursor: pointer;
     transition: 0.25s;
     backdrop-filter: blur(4px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 .btn:hover {
     transform: scale(1.03);
-    background: #b77eff;
-    box-shadow: 0 8px 20px rgba(140, 92, 255, 0.4);
+    background: #bb9fdf;
+    box-shadow: 0 8px 20px rgba(130, 100, 170, 0.3);
 }
 
 /* 信封容器 */
@@ -214,8 +215,8 @@ body {
     position: relative;
     cursor: pointer;
     border-radius: 14px;
-    background: #fff2e0;
-    box-shadow: 0 20px 30px rgba(0,0,0,0.2);
+    background: #fff7ef;
+    box-shadow: 0 20px 30px rgba(0,0,0,0.12);
     transition: transform 0.2s;
     animation: gentleFloat 3s ease-in-out infinite;
 }
@@ -227,7 +228,7 @@ body {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: #caa6ff;
+    background: #cbb2e6; /* 低饱和紫 */
     clip-path: polygon(0 0, 100% 0, 50% 92%);
     transform-origin: top;
     transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
@@ -240,15 +241,15 @@ body {
     height: 100%;
     background: #fffaf2;
     border-radius: 14px;
-    box-shadow: inset 0 1px 4px rgba(0,0,0,0.05);
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.03);
 }
 .body::after {
     content: "";
     position: absolute;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, transparent 49%, rgba(0,0,0,0.03) 50%, transparent 51%),
-                linear-gradient(225deg, transparent 49%, rgba(0,0,0,0.03) 50%, transparent 51%);
+    background: linear-gradient(135deg, transparent 49%, rgba(0,0,0,0.02) 50%, transparent 51%),
+                linear-gradient(225deg, transparent 49%, rgba(0,0,0,0.02) 50%, transparent 51%);
     pointer-events: none;
 }
 .envelope.open .flap {
@@ -257,9 +258,9 @@ body {
 .hint {
     margin-top: 1.5rem;
     font-size: 1rem;
-    color: #a16eff;
+    color: #b6a1d4;
     font-weight: 500;
-    background: rgba(255,255,240,0.6);
+    background: rgba(245, 240, 255, 0.6);
     padding: 0.3rem 1rem;
     border-radius: 60px;
     backdrop-filter: blur(4px);
@@ -277,8 +278,8 @@ body {
     line-height: 1.9;
     overflow-wrap: break-word;
     word-break: break-word;
-    box-shadow: 0 20px 35px rgba(0,0,0,0.15);
-    border: 1px solid rgba(255,255,200,0.6);
+    box-shadow: 0 20px 35px rgba(0,0,0,0.12);
+    border: 1px solid rgba(230, 220, 255, 0.6);
 }
 .letter p {
     text-indent: 2em;
@@ -296,17 +297,17 @@ body {
     width: 92%;
     max-width: 520px;
     padding: 2rem 1.8rem;
-    background: rgba(255, 245, 255, 0.88);
+    background: rgba(250, 245, 255, 0.88);
     backdrop-filter: blur(12px);
     border-radius: 48px;
     text-align: center;
     font-size: 1.2rem;
     line-height: 2.4;
-    box-shadow: 0 20px 30px rgba(0,0,0,0.2);
-    border: 1px solid rgba(255,215,255,0.6);
+    box-shadow: 0 20px 30px rgba(0,0,0,0.12);
+    border: 1px solid rgba(220, 205, 255, 0.6);
 }
 .countdown-box {
-    background: rgba(169, 124, 255, 0.2);
+    background: rgba(177, 152, 207, 0.2);
     border-radius: 60px;
     padding: 0.3rem 1rem;
     display: inline-block;
@@ -318,14 +319,14 @@ body {
     display: inline-block;
     padding: 0.4rem 1.2rem;
     border-radius: 40px;
-    background: rgba(140, 92, 255, 0.2);
-    color: #7b4cff;
+    background: rgba(170, 140, 210, 0.2);
+    color: #aa82cf;
     font-weight: bold;
     cursor: pointer;
     transition: 0.2s;
 }
 .map-link:hover {
-    background: rgba(140, 92, 255, 0.4);
+    background: rgba(170, 140, 210, 0.4);
     transform: scale(1.02);
 }
 .heart-fly {
@@ -403,7 +404,7 @@ body {
 <!-- 信件内容 P4 -->
 <div class="page" id="page4">
     <div class="letter" id="letterContent"></div>
-    <div style="margin-top: 20px; font-size: 0.85rem; color: #b27eff;">✨ 轻点任意处 继续 ✨</div>
+    <div style="margin-top: 20px; font-size: 0.85rem; color: #b6a1d4;">✨ Click it ✨</div>
 </div>
 
 <!-- 派对详情 P5 -->
@@ -426,52 +427,66 @@ let currentPageIdx = 0;
 let userName = "Bunnies";
 let envelopeOpened = false;
 let musicPlaying = false;
-let fogDissolved = false;      // 确保雾层只散开一次
+let fogDissolved = false;
 let coverLoaded = false;
 
-// ---------- 封面图加载处理（稳健降级）----------
+// ---------- 背景封面模式切换 ----------
+function setBgCoverMode(enable) {
+    if (enable) {
+        bgLayer.classList.add('cover-mode');
+    } else {
+        bgLayer.classList.remove('cover-mode');
+        // 移除可能残留的 clear 类，避免影响纯色背景
+        bgLayer.classList.remove('clear');
+    }
+}
+
+// 封面页激活时启用背景图片，否则禁用
+function updateBgMode() {
+    const isCoverPage = currentPageIdx === 0;
+    setBgCoverMode(isCoverPage);
+}
+
+// ---------- 封面图加载处理 ----------
 const coverImg = document.getElementById('coverImg');
 function handleCoverLoaded() {
     if (coverLoaded) return;
     coverLoaded = true;
-    // 添加loaded类触发渐显动画
     coverImg.classList.add('loaded');
-    // 封面图加载完成后，再启动雾层散开（一秒散开效果）
-    if (!fogDissolved) {
+    // 封面图加载完成后，雾层散开（仅封面模式生效）
+    if (!fogDissolved && bgLayer.classList.contains('cover-mode')) {
         setTimeout(() => {
             startFogDissolve();
-        }, 80); // 稍微延迟让封面动画更平滑
+        }, 80);
         fogDissolved = true;
     }
 }
 function handleCoverError() {
-    // 优雅降级：使用内嵌 SVG 渐变 + 文字占位，完全本地，无需网络请求，杜绝 missing
-    const svgData = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 1000'%3E%3Crect width='100%25' height='100%25' fill='%23d9c6ea'/%3E%3Ctext x='50%25' y='45%25' font-size='32' font-family='monospace' fill='%238c5cff' text-anchor='middle'%3E🐹 Hyein's Party 🐹%3C/text%3E%3Ctext x='50%25' y='55%25' font-size='24' fill='%23a97cff' text-anchor='middle'%3E💜 紫色波点之约 💜%3C/text%3E%3C/svg%3E`;
+    // 优雅降级
+    const svgData = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 1000'%3E%3Crect width='100%25' height='100%25' fill='%23e2d5f0'/%3E%3Ctext x='50%25' y='45%25' font-size='32' font-family='monospace' fill='%23aa82cf' text-anchor='middle'%3E🐹 Hyein's Party 🐹%3C/text%3E%3Ctext x='50%25' y='55%25' font-size='24' fill='%23b198cf' text-anchor='middle'%3E💜 紫色波点之约 💜%3C/text%3E%3C/svg%3E`;
     coverImg.src = svgData;
-    // 即使降级，依然触发加载完成效果
     handleCoverLoaded();
 }
 if (coverImg) {
     if (coverImg.complete && coverImg.naturalWidth !== 0) {
-        // 图片已缓存，直接触发
         handleCoverLoaded();
     } else {
         coverImg.addEventListener('load', handleCoverLoaded);
         coverImg.addEventListener('error', handleCoverError);
     }
 } else {
-    // 极端情况无img元素，直接散开雾层
-    startFogDissolve();
+    // 无封面图则直接启用纯色背景（无封面模式）
+    setBgCoverMode(false);
 }
 
-// ---------- 雾层一秒散开 (背景清晰露出) ----------
+// ---------- 雾层散开 ----------
 function startFogDissolve() {
-    if (bgLayer && !bgLayer.classList.contains('clear')) {
+    if (bgLayer && bgLayer.classList.contains('cover-mode') && !bgLayer.classList.contains('clear')) {
         bgLayer.classList.add('clear');
     }
 }
 
-// ---------- 音乐自动播放 (兼容微信/浏览器) ----------
+// ---------- 音乐自动播放 ----------
 function initAutoPlayMusic() {
     const music = document.getElementById('bgMusic');
     if (!music) return;
@@ -497,6 +512,7 @@ function goToPage(index) {
     pages.forEach(page => page.classList.remove('active'));
     pages[index].classList.add('active');
     currentPageIdx = index;
+    updateBgMode();      // 根据当前页面决定背景是否使用封面图
     if (index === 3) renderLetter();
     if (index === 4) updateCountdownDisplay();
 }
@@ -620,13 +636,14 @@ window.addEventListener('load', () => {
     bindEvents();
     startCountdownTimer();
     initAutoPlayMusic();
-    renderLetter();          // 预渲染信件内容
-    // 如果封面图在load之前已经加载完成，handleCoverLoaded已调用；如果未完成则等待事件。
-    // 额外兜底：若3秒后封面仍未触发loaded（罕见情况），手动强制散开雾层
+    renderLetter();
+    // 确保初始背景模式正确（封面页）
+    updateBgMode();
+    // 兜底：如果封面图未触发loaded，3秒后强制显示并散雾
     setTimeout(() => {
         if (!coverLoaded) {
             coverImg.classList.add('loaded');
-            if (!fogDissolved) {
+            if (!fogDissolved && bgLayer.classList.contains('cover-mode')) {
                 startFogDissolve();
                 fogDissolved = true;
             }
