@@ -390,8 +390,7 @@ body {
 <div class="bg" id="bgLayer"></div>
 <div class="dots" id="dotsLayer"></div>
 
-<!-- 音频元素：添加 autoplay 属性，确保页面加载即播放 -->
-<audio id="bgMusic" src="music.mp3" loop preload="auto" autoplay></audio>
+<audio id="bgMusic" loop preload="auto"></audio>
 
 <!-- 封面页 P1 -->
 <div class="page active" id="page1">
@@ -446,29 +445,48 @@ let musicPlaying = false;
 let fogDissolved = false;
 let coverLoaded = false;
 let bgImageLoaded = false;
+let playAttempts = 0;
+const MAX_ATTEMPTS = 5;
 
-// ---------- 音乐自动播放（确保微信内也生效）----------
-function initAutoPlayMusic() {
+// ---------- 音乐播放核心（每次加载都重新设置 src）----------
+function playMusic() {
     const music = document.getElementById('bgMusic');
     if (!music) return;
     if (musicPlaying) return;
+    
+    // 强制重新设置 src，避免缓存问题
+    music.src = 'music.mp3';
+    music.load();
     music.volume = 0.5;
-    const tryPlay = () => {
-        music.play().then(() => {
-            musicPlaying = true;
-            console.log('音乐播放成功');
-        }).catch(err => {
-            console.log('自动播放被阻止:', err);
-        });
-    };
-    // 微信专用事件：在 WeixinJSBridgeReady 触发时播放
+    
+    music.play().then(() => {
+        musicPlaying = true;
+        console.log('音乐播放成功');
+    }).catch(err => {
+        console.log('播放失败，尝试次数：', playAttempts, err);
+        if (playAttempts < MAX_ATTEMPTS) {
+            playAttempts++;
+            setTimeout(playMusic, 300);
+        }
+    });
+}
+
+// ---------- 自动播放初始化（多重保障）----------
+function initAutoPlayMusic() {
+    // 1. 页面加载后立即尝试
+    setTimeout(playMusic, 100);
+    
+    // 2. 微信专用事件
     if (typeof WeixinJSBridge !== 'undefined') {
-        document.addEventListener('WeixinJSBridgeReady', tryPlay);
-    } else {
-        // 非微信环境，直接尝试播放（autoplay 已尝试，此处兜底）
-        setTimeout(tryPlay, 100);
+        document.addEventListener('WeixinJSBridgeReady', () => {
+            if (!musicPlaying) playMusic();
+        });
     }
-    // 注意：autoplay 属性已经让浏览器尝试播放，上面的 tryPlay 是额外保障
+    
+    // 3. 页面完全加载后再尝试一次（兜底）
+    window.addEventListener('load', () => {
+        if (!musicPlaying) playMusic();
+    });
 }
 
 // ---------- 预加载背景图 ----------
@@ -559,7 +577,6 @@ function goToPage(index) {
     if (index === 3) renderLetter();
     if (index === 4) updateCountdownDisplay();
 
-    // 保活音乐：如果音乐被意外暂停且应该播放，则恢复
     const music = document.getElementById('bgMusic');
     if (music && music.paused && musicPlaying) {
         music.play().catch(e => console.log('恢复播放失败', e));
@@ -690,7 +707,7 @@ window.addEventListener('load', () => {
     updateBgMode();
     updateDotsOpacity();
     
-    // 启动音乐（确保播放）
+    // 启动音乐
     initAutoPlayMusic();
     
     setTimeout(() => {
