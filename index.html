@@ -390,7 +390,6 @@ body {
 <div class="bg" id="bgLayer"></div>
 <div class="dots" id="dotsLayer"></div>
 
-<!-- 音频元素：直接设置 src 和 loop，简单可靠 -->
 <audio id="bgMusic" src="music.mp3" loop preload="auto"></audio>
 
 <!-- 封面页 P1 -->
@@ -447,11 +446,12 @@ let fogDissolved = false;
 let coverLoaded = false;
 let bgImageLoaded = false;
 
-// ---------- 简单音乐自动播放（无淡入淡出）----------
+// ---------- 简单音乐自动播放 ----------
 function initAutoPlayMusic() {
     const music = document.getElementById('bgMusic');
     if (!music) return;
-    music.volume = 0.5; // 设置合适音量
+    if (musicPlaying) return;
+    music.volume = 0.5;
     const tryPlay = () => {
         music.play().then(() => {
             musicPlaying = true;
@@ -461,18 +461,20 @@ function initAutoPlayMusic() {
         });
     };
     // 微信专用事件
-    document.addEventListener('WeixinJSBridgeReady', () => {
-        tryPlay();
-    });
-    // 页面加载后尝试播放
-    setTimeout(tryPlay, 100);
+    if (typeof WeixinJSBridge !== 'undefined') {
+        document.addEventListener('WeixinJSBridgeReady', tryPlay);
+    } else {
+        // 非微信环境，页面加载后尝试
+        setTimeout(tryPlay, 100);
+    }
     // 用户首次触摸保底（如果自动播放失败）
-    document.addEventListener('click', () => {
+    const onceTouch = () => {
         if (!musicPlaying) tryPlay();
-    }, { once: true });
-    document.addEventListener('touchstart', () => {
-        if (!musicPlaying) tryPlay();
-    }, { once: true });
+        document.removeEventListener('touchstart', onceTouch);
+        document.removeEventListener('click', onceTouch);
+    };
+    document.addEventListener('touchstart', onceTouch, { once: true });
+    document.addEventListener('click', onceTouch, { once: true });
 }
 
 // ---------- 预加载背景图 ----------
@@ -697,7 +699,6 @@ window.addEventListener('load', () => {
     // 启动音乐
     initAutoPlayMusic();
     
-    // 兜底：如果封面图未触发loaded，2.5秒后强制显示
     setTimeout(() => {
         if (!coverLoaded) {
             coverImg.classList.add('loaded');
@@ -709,6 +710,17 @@ window.addEventListener('load', () => {
         }
     }, 2500);
 });
+
+// 微信专用事件：确保自动播放
+if (typeof WeixinJSBridge !== 'undefined') {
+    document.addEventListener('WeixinJSBridgeReady', () => {
+        if (!musicPlaying) initAutoPlayMusic();
+    });
+} else {
+    document.addEventListener('WeixinJSBridgeReady', () => {
+        if (!musicPlaying) initAutoPlayMusic();
+    });
+}
 
 // 页面可见性变化时保活音乐
 document.addEventListener('visibilitychange', () => {
