@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hyein Invitation</title>
 
+    <!-- 分享卡片 -->
+<meta property="og:title" content="🐹Hyein Invitation🐹">
+<meta property="og:description" content="Open it ✨">
+<meta property="og:image" content="./cover.jpg">
+
 <link rel="preload" as="image" href="./cover.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&family=Noto+Serif+SC:wght@400;500&display=swap" rel="stylesheet">
 
@@ -307,7 +312,7 @@ button:hover{
 
 <!-- 信件 -->
 <div class="page" id="p4" onclick="nextPage()">
-<div class="letter" id="letter" onclick="event.stopPropagation()"></div>
+<div class="letter" id="letter" </div>
 </div>
 
 <!-- 信息 -->
@@ -332,13 +337,22 @@ document.querySelector(".cover").classList.add("loaded");
 createDots();
 };
 
-function nextPage(){
-if(!musicStarted){
-let music=document.getElementById("music");
-music.volume=0.4;
-music.play().catch(()=>{});
-musicStarted=true;
+/* 微信自动播放黑科技 */
+function autoPlayMusic(){
+    let music=document.getElementById("music");
+    music.volume=0.4;
+
+    function play(){
+        music.play().catch(()=>{});
+    }
+
+    document.addEventListener("click", play, {once:true});
+    document.addEventListener("WeixinJSBridgeReady", play);
+    document.addEventListener("touchstart", play, {once:true});
 }
+autoPlayMusic();
+
+
 document.getElementById("p"+page).classList.remove("active");
 page++;
 document.getElementById("p"+page).classList.add("active");
@@ -373,6 +387,28 @@ document.getElementById("letter").innerHTML = `
 <p style="text-align:right;margin-top:20px;">Yours,<br>Hyein</p>
 `;
 }
+    
+/* 倒计时 */
+function updateCountdown(){
+    let target=new Date("2026-04-18 00:00:00");
+    let now=new Date();
+    let diff=target-now;
+
+    if(diff<=0){
+        document.getElementById("countdown").innerHTML="🎉 今天就是！";
+        return;
+    }
+
+    let d=Math.floor(diff/1000/60/60/24);
+    let h=Math.floor(diff/1000/60/60)%24;
+    let m=Math.floor(diff/1000/60)%60;
+
+    document.getElementById("countdown").innerHTML=
+    `⏳ 倒计时：${d}天 ${h}小时 ${m}分`;
+}
+setInterval(updateCountdown,1000);
+updateCountdown();
+
 
 function goMap(){
 window.open("https://surl.amap.com/cYD2lgm1A9q1");
