@@ -74,7 +74,7 @@ body {
     opacity: 0;
 }
 
-/* 波点装饰 (氛围用) */
+/* 波点装饰 (增强发光效果) */
 .dots {
     position: fixed;
     width: 100%;
@@ -87,9 +87,10 @@ body {
     position: absolute;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255,255,240,0.85) 10px, transparent 11px);
+    background: radial-gradient(circle, rgba(255, 255, 245, 1) 10px, transparent 11px);
     background-size: 85px 85px;
-    animation: breath1 5s ease-in-out infinite alternate;
+    filter: drop-shadow(0 0 6px rgba(255, 235, 140, 0.9));
+    animation: breath1 4s ease-in-out infinite alternate;
 }
 .dots::after {
     content: "";
@@ -97,17 +98,18 @@ body {
     width: 200%;
     height: 200%;
     transform: translate(42px, 42px);
-    background: radial-gradient(circle, rgba(255,250,220,0.7) 9px, transparent 10px);
+    background: radial-gradient(circle, rgba(220, 200, 255, 0.9) 9px, transparent 10px);
     background-size: 85px 85px;
-    animation: breath2 6s ease-in-out infinite alternate;
+    filter: drop-shadow(0 0 5px rgba(200, 170, 255, 0.7));
+    animation: breath2 5s ease-in-out infinite alternate;
 }
 @keyframes breath1 {
-    from { opacity: 0.45; }
-    to { opacity: 0.9; }
+    from { opacity: 0.5; filter: drop-shadow(0 0 3px rgba(255, 235, 140, 0.6)); }
+    to { opacity: 1; filter: drop-shadow(0 0 10px rgba(255, 240, 180, 1)); }
 }
 @keyframes breath2 {
-    from { opacity: 0.3; }
-    to { opacity: 0.8; }
+    from { opacity: 0.4; filter: drop-shadow(0 0 2px rgba(200, 170, 255, 0.5)); }
+    to { opacity: 0.9; filter: drop-shadow(0 0 8px rgba(210, 180, 255, 0.9)); }
 }
 
 /* 页面容器 */
@@ -159,7 +161,7 @@ body {
 /* 标题 */
 .title {
     font-size: 3rem;
-    color: #b198cf; /* 低饱和淡紫 */
+    color: #b198cf;
     text-shadow: 0 2px 8px rgba(0,0,0,0.08);
     letter-spacing: 2px;
     margin-bottom: 0.5rem;
@@ -228,7 +230,7 @@ body {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: #cbb2e6; /* 低饱和紫 */
+    background: #cbb2e6;
     clip-path: polygon(0 0, 100% 0, 50% 92%);
     transform-origin: top;
     transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
@@ -404,7 +406,6 @@ body {
 <!-- 信件内容 P4 -->
 <div class="page" id="page4">
     <div class="letter" id="letterContent"></div>
-    <div style="margin-top: 20px; font-size: 0.85rem; color: #b6a1d4;">✨ Click it ✨</div>
 </div>
 
 <!-- 派对详情 P5 -->
@@ -429,6 +430,27 @@ let envelopeOpened = false;
 let musicPlaying = false;
 let fogDissolved = false;
 let coverLoaded = false;
+let bgImageLoaded = false;
+
+// ---------- 预加载背景图，确保封面页启用时图片已缓存 ----------
+function preloadBgImage() {
+    const img = new Image();
+    img.onload = () => {
+        bgImageLoaded = true;
+        if (coverLoaded && bgLayer.classList.contains('cover-mode') && !fogDissolved) {
+            startFogDissolve();
+            fogDissolved = true;
+        }
+    };
+    img.onerror = () => {
+        bgImageLoaded = true;
+        if (coverLoaded && bgLayer.classList.contains('cover-mode') && !fogDissolved) {
+            startFogDissolve();
+            fogDissolved = true;
+        }
+    };
+    img.src = './cover.jpg';
+}
 
 // ---------- 背景封面模式切换 ----------
 function setBgCoverMode(enable) {
@@ -436,12 +458,10 @@ function setBgCoverMode(enable) {
         bgLayer.classList.add('cover-mode');
     } else {
         bgLayer.classList.remove('cover-mode');
-        // 移除可能残留的 clear 类，避免影响纯色背景
         bgLayer.classList.remove('clear');
     }
 }
 
-// 封面页激活时启用背景图片，否则禁用
 function updateBgMode() {
     const isCoverPage = currentPageIdx === 0;
     setBgCoverMode(isCoverPage);
@@ -453,17 +473,13 @@ function handleCoverLoaded() {
     if (coverLoaded) return;
     coverLoaded = true;
     coverImg.classList.add('loaded');
-    // 封面图加载完成后，雾层散开（仅封面模式生效）
-    if (!fogDissolved && bgLayer.classList.contains('cover-mode')) {
-        setTimeout(() => {
-            startFogDissolve();
-        }, 80);
+    if (bgImageLoaded && bgLayer.classList.contains('cover-mode') && !fogDissolved) {
+        startFogDissolve();
         fogDissolved = true;
     }
 }
 function handleCoverError() {
-    // 优雅降级
-    const svgData = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 1000'%3E%3Crect width='100%25' height='100%25' fill='%23e2d5f0'/%3E%3Ctext x='50%25' y='45%25' font-size='32' font-family='monospace' fill='%23aa82cf' text-anchor='middle'%3E🐹 Hyein's Party 🐹%3C/text%3E%3Ctext x='50%25' y='55%25' font-size='24' fill='%23b198cf' text-anchor='middle'%3E💜 紫色波点之约 💜%3C/text%3E%3C/svg%3E`;
+    const svgData = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 1000'%3E%3Crect width='100%25' height='100%25' fill='%23e2d5f0'/%3E%3Ctext x='50%25' y='45%25' font-size='32' font-family='monospace' fill='%23aa82cf' text-anchor='middle'%3E🐹 Hyein's Party 🐹%3C/text%3E%3Ctext x='50%25' y='55%25' font-size='24' fill='%23b198cf' text-anchor='middle'%3E💜 Happy Hyein's Day 💜%3C/text%3E%3C/svg%3E`;
     coverImg.src = svgData;
     handleCoverLoaded();
 }
@@ -475,18 +491,15 @@ if (coverImg) {
         coverImg.addEventListener('error', handleCoverError);
     }
 } else {
-    // 无封面图则直接启用纯色背景（无封面模式）
     setBgCoverMode(false);
 }
 
-// ---------- 雾层散开 ----------
 function startFogDissolve() {
     if (bgLayer && bgLayer.classList.contains('cover-mode') && !bgLayer.classList.contains('clear')) {
         bgLayer.classList.add('clear');
     }
 }
 
-// ---------- 音乐自动播放 ----------
 function initAutoPlayMusic() {
     const music = document.getElementById('bgMusic');
     if (!music) return;
@@ -506,13 +519,12 @@ function initAutoPlayMusic() {
     }, 800);
 }
 
-// ---------- 页面切换 ----------
 function goToPage(index) {
     if (index < 0 || index >= pages.length) return;
     pages.forEach(page => page.classList.remove('active'));
     pages[index].classList.add('active');
     currentPageIdx = index;
-    updateBgMode();      // 根据当前页面决定背景是否使用封面图
+    updateBgMode();
     if (index === 3) renderLetter();
     if (index === 4) updateCountdownDisplay();
 }
@@ -630,23 +642,22 @@ function bindEvents() {
     if (confirmBtn) confirmBtn.addEventListener('click', confirmAttendance);
 }
 
-// 初始化
 window.addEventListener('load', () => {
+    preloadBgImage();
     setupEnvelope();
     bindEvents();
     startCountdownTimer();
     initAutoPlayMusic();
     renderLetter();
-    // 确保初始背景模式正确（封面页）
     updateBgMode();
-    // 兜底：如果封面图未触发loaded，3秒后强制显示并散雾
     setTimeout(() => {
         if (!coverLoaded) {
             coverImg.classList.add('loaded');
-            if (!fogDissolved && bgLayer.classList.contains('cover-mode')) {
-                startFogDissolve();
-                fogDissolved = true;
-            }
+            coverLoaded = true;
+        }
+        if (!fogDissolved && bgLayer.classList.contains('cover-mode')) {
+            startFogDissolve();
+            fogDissolved = true;
         }
     }, 2500);
 });
