@@ -46,7 +46,7 @@ body {
     left: 0;
     width: 100%;
     height: 100vh;
-    background: #e2d5f0; /* 低饱和香芋紫 */
+    background: #e2d5f0;
     transition: filter 0.9s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.9s ease-out;
     z-index: 0;
 }
@@ -74,15 +74,15 @@ body {
     opacity: 0;
 }
 
-/* 波点装饰 (增强发光效果) */
+/* 波点装饰 */
 .dots {
     position: fixed;
     width: 100%;
     height: 100%;
     pointer-events: none;
     z-index: 1;
+    transition: opacity 0.5s ease;
 }
-/* 波点装饰 - 白色光晕呼吸感 */
 .dots::before,
 .dots::after {
     content: "";
@@ -96,7 +96,7 @@ body {
 }
 .dots::after {
     transform: translate(42px, 42px);
-    animation-delay: -1s; /* 错开动画，更灵动 */
+    animation-delay: -1s;
 }
 @keyframes breath {
     0% {
@@ -106,6 +106,22 @@ body {
     100% {
         opacity: 0.95;
         filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.9));
+    }
+}
+/* 第一页波点透明度降低 */
+.dots.fade-dots::before,
+.dots.fade-dots::after {
+    opacity: 0.25;
+    animation: breathFade 5s ease-in-out infinite alternate;
+}
+@keyframes breathFade {
+    0% {
+        opacity: 0.15;
+        filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.2));
+    }
+    100% {
+        opacity: 0.45;
+        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
     }
 }
 
@@ -130,7 +146,7 @@ body {
     pointer-events: auto;
 }
 
-/* 封面图 - 优化渲染性能 */
+/* 封面图 */
 .cover {
     width: 92%;
     max-width: 640px;
@@ -291,7 +307,7 @@ body {
     margin-bottom: 0;
 }
 
-/* 卡片页 (party info) */
+/* 卡片页 */
 .card {
     width: 92%;
     max-width: 520px;
@@ -372,9 +388,9 @@ body {
 <body>
 
 <div class="bg" id="bgLayer"></div>
-<div class="dots"></div>
+<div class="dots" id="dotsLayer"></div>
 
-<audio id="bgMusic" src="music.mp3" loop preload="auto"></audio>
+<audio id="bgMusic" loop preload="auto"></audio>
 
 <!-- 封面页 P1 -->
 <div class="page active" id="page1">
@@ -420,6 +436,7 @@ body {
 <script>
 // ---------- DOM 元素 ----------
 const bgLayer = document.getElementById('bgLayer');
+const dotsLayer = document.getElementById('dotsLayer');
 const pages = [document.getElementById('page1'), document.getElementById('page2'), document.getElementById('page3'), document.getElementById('page4'), document.getElementById('page5')];
 let currentPageIdx = 0;
 let userName = "Bunnies";
@@ -428,8 +445,30 @@ let musicPlaying = false;
 let fogDissolved = false;
 let coverLoaded = false;
 let bgImageLoaded = false;
+let musicFadeInterval = null;
 
-// ---------- 预加载背景图，确保封面页启用时图片已缓存 ----------
+// ---------- 音乐淡入 ----------
+function fadeInMusic(audio, targetVolume = 0.35, duration = 1500) {
+    if (musicFadeInterval) clearInterval(musicFadeInterval);
+    audio.volume = 0;
+    audio.play().catch(err => console.log('自动播放被阻止:', err));
+    const stepTime = 50;
+    const steps = duration / stepTime;
+    const stepVolume = targetVolume / steps;
+    let currentStep = 0;
+    musicFadeInterval = setInterval(() => {
+        currentStep++;
+        let newVol = stepVolume * currentStep;
+        if (newVol >= targetVolume) {
+            newVol = targetVolume;
+            clearInterval(musicFadeInterval);
+            musicFadeInterval = null;
+        }
+        audio.volume = newVol;
+    }, stepTime);
+}
+
+// ---------- 预加载背景图 ----------
 function preloadBgImage() {
     const img = new Image();
     img.onload = () => {
@@ -497,23 +536,27 @@ function startFogDissolve() {
     }
 }
 
+// ---------- 立即启动音乐（页面加载后直接播放）----------
 function initAutoPlayMusic() {
     const music = document.getElementById('bgMusic');
     if (!music) return;
-    music.volume = 0.35;
-    const tryPlay = () => {
-        music.play().then(() => {
-            musicPlaying = true;
-        }).catch(() => {});
-    };
-    document.addEventListener('click', tryPlay, { once: true });
-    document.addEventListener('touchstart', tryPlay, { once: true });
-    document.addEventListener('WeixinJSBridgeReady', () => {
-        music.play().catch(()=>{});
-    });
-    setTimeout(() => {
-        if (!musicPlaying) tryPlay();
-    }, 800);
+    // 设置音频源（避免页面加载时预下载大文件）
+    music.src = 'music.mp3';
+    // 立即播放并淡入
+    if (!musicPlaying) {
+        fadeInMusic(music, 0.35, 1500);
+        musicPlaying = true;
+    }
+}
+
+// ---------- 页面切换，控制波点透明度 ----------
+function updateDotsOpacity() {
+    if (!dotsLayer) return;
+    if (currentPageIdx === 0) {
+        dotsLayer.classList.add('fade-dots');
+    } else {
+        dotsLayer.classList.remove('fade-dots');
+    }
 }
 
 function goToPage(index) {
@@ -522,6 +565,7 @@ function goToPage(index) {
     pages[index].classList.add('active');
     currentPageIdx = index;
     updateBgMode();
+    updateDotsOpacity();
     if (index === 3) renderLetter();
     if (index === 4) updateCountdownDisplay();
 }
@@ -639,14 +683,19 @@ function bindEvents() {
     if (confirmBtn) confirmBtn.addEventListener('click', confirmAttendance);
 }
 
+// 页面加载完成后立即播放音乐并执行其他初始化
 window.addEventListener('load', () => {
     preloadBgImage();
     setupEnvelope();
     bindEvents();
     startCountdownTimer();
-    initAutoPlayMusic();
     renderLetter();
     updateBgMode();
+    updateDotsOpacity();
+    // 立即启动音乐（淡入）
+    initAutoPlayMusic();
+    
+    // 兜底：如果封面图未触发loaded，2.5秒后强制显示
     setTimeout(() => {
         if (!coverLoaded) {
             coverImg.classList.add('loaded');
@@ -658,6 +707,17 @@ window.addEventListener('load', () => {
         }
     }, 2500);
 });
+
+// 微信内WeixinJSBridgeReady事件也触发一次，确保自动播放
+if (typeof WeixinJSBridge !== 'undefined') {
+    document.addEventListener('WeixinJSBridgeReady', () => {
+        if (!musicPlaying) initAutoPlayMusic();
+    });
+} else {
+    document.addEventListener('WeixinJSBridgeReady', () => {
+        if (!musicPlaying) initAutoPlayMusic();
+    });
+}
 </script>
 </body>
 </html>
