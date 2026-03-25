@@ -390,7 +390,8 @@ body {
 <div class="bg" id="bgLayer"></div>
 <div class="dots" id="dotsLayer"></div>
 
-<audio id="bgMusic" src="music.mp3" loop preload="auto"></audio>
+<!-- 音频元素：添加 autoplay 属性，确保页面加载即播放 -->
+<audio id="bgMusic" src="music.mp3" loop preload="auto" autoplay></audio>
 
 <!-- 封面页 P1 -->
 <div class="page active" id="page1">
@@ -446,7 +447,7 @@ let fogDissolved = false;
 let coverLoaded = false;
 let bgImageLoaded = false;
 
-// ---------- 简单音乐自动播放 ----------
+// ---------- 音乐自动播放（确保微信内也生效）----------
 function initAutoPlayMusic() {
     const music = document.getElementById('bgMusic');
     if (!music) return;
@@ -460,21 +461,14 @@ function initAutoPlayMusic() {
             console.log('自动播放被阻止:', err);
         });
     };
-    // 微信专用事件
+    // 微信专用事件：在 WeixinJSBridgeReady 触发时播放
     if (typeof WeixinJSBridge !== 'undefined') {
         document.addEventListener('WeixinJSBridgeReady', tryPlay);
     } else {
-        // 非微信环境，页面加载后尝试
+        // 非微信环境，直接尝试播放（autoplay 已尝试，此处兜底）
         setTimeout(tryPlay, 100);
     }
-    // 用户首次触摸保底（如果自动播放失败）
-    const onceTouch = () => {
-        if (!musicPlaying) tryPlay();
-        document.removeEventListener('touchstart', onceTouch);
-        document.removeEventListener('click', onceTouch);
-    };
-    document.addEventListener('touchstart', onceTouch, { once: true });
-    document.addEventListener('click', onceTouch, { once: true });
+    // 注意：autoplay 属性已经让浏览器尝试播放，上面的 tryPlay 是额外保障
 }
 
 // ---------- 预加载背景图 ----------
@@ -696,7 +690,7 @@ window.addEventListener('load', () => {
     updateBgMode();
     updateDotsOpacity();
     
-    // 启动音乐
+    // 启动音乐（确保播放）
     initAutoPlayMusic();
     
     setTimeout(() => {
@@ -710,17 +704,6 @@ window.addEventListener('load', () => {
         }
     }, 2500);
 });
-
-// 微信专用事件：确保自动播放
-if (typeof WeixinJSBridge !== 'undefined') {
-    document.addEventListener('WeixinJSBridgeReady', () => {
-        if (!musicPlaying) initAutoPlayMusic();
-    });
-} else {
-    document.addEventListener('WeixinJSBridgeReady', () => {
-        if (!musicPlaying) initAutoPlayMusic();
-    });
-}
 
 // 页面可见性变化时保活音乐
 document.addEventListener('visibilitychange', () => {
