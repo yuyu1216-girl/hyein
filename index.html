@@ -510,24 +510,22 @@ function setupLoopWithFade(audio) {
     audio.addEventListener('ended', musicEndedHandler);
 }
 
-// ---------- 音乐自动播放 ----------
+// ---------- 启动音乐（带淡入淡出循环）----------
 function initAutoPlayMusic() {
     const music = document.getElementById('bgMusic');
     if (!music) return;
-    music.volume = 0.35;
-    const tryPlay = () => {
-        music.play().then(() => {
-            musicPlaying = true;
-        }).catch(() => {});
-    };
-    document.addEventListener('click', tryPlay, { once: true });
-    document.addEventListener('touchstart', tryPlay, { once: true });
-    document.addEventListener('WeixinJSBridgeReady', () => {
-        music.play().catch(()=>{});
-    });
-    setTimeout(() => {
-        if (!musicPlaying) tryPlay();
-    }, 800);
+    if (musicPlaying) return;
+    
+    // 设置 src（只设置一次）
+    if (!music.src || music.src === '') {
+        music.src = 'music.mp3';
+        music.load();
+    }
+    
+    // 播放并淡入
+    fadeInMusic(music, 0.35, 1500);
+    musicPlaying = true;
+    setupLoopWithFade(music);
 }
 
 // ---------- 预加载背景图 ----------
@@ -723,7 +721,7 @@ function setupEnvelope() {
 }
 
 function bindEvents() {
-    // 只给封面图添加点击跳转，不给整个页面添加
+    // 只给封面图添加点击跳转
     const coverImgClick = document.querySelector('#page1 .cover');
     if (coverImgClick) coverImgClick.addEventListener('click', () => nextPage());
     const okBtn = document.getElementById('okNameBtn');
@@ -738,7 +736,7 @@ function bindEvents() {
     if (confirmBtn) confirmBtn.addEventListener('click', confirmAttendance);
 }
 
-// ========== 自动播放音乐（页面加载后立即启动）==========
+// 页面加载完成后立即启动音乐并执行其他初始化
 window.addEventListener('load', () => {
     preloadBgImage();
     setupEnvelope();
@@ -748,7 +746,7 @@ window.addEventListener('load', () => {
     updateBgMode();
     updateDotsOpacity();
     
-    // 立即启动音乐
+    // 立即启动音乐（淡入）
     initAutoPlayMusic();
     
     setTimeout(() => {
