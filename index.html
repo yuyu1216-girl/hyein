@@ -61,7 +61,7 @@ body {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: rgba(226, 213, 240, 0.2);
+    background: rgba(226, 213, 240, 0.3);
     transition: opacity 0.9s ease-out;
     opacity: 1;
 }
@@ -446,26 +446,97 @@ let fogDissolved = false;
 let coverLoaded = false;
 let bgImageLoaded = false;
 let musicFadeInterval = null;
+let musicEndedHandler = null;
+let userInteracted = false; // 标记用户是否已经交互过
 
-// ---------- 音乐淡入 ----------
-function fadeInMusic(audio, targetVolume = 0.35, duration = 1500) {
+// ---------- 音乐淡出 ----------
+function fadeOutMusic(audio, duration = 1000, callback) {
     if (musicFadeInterval) clearInterval(musicFadeInterval);
-    audio.volume = 0;
-    audio.play().catch(err => console.log('自动播放被阻止:', err));
+    const startVolume = audio.volume;
     const stepTime = 50;
     const steps = duration / stepTime;
-    const stepVolume = targetVolume / steps;
+    const stepVolume = startVolume / steps;
     let currentStep = 0;
     musicFadeInterval = setInterval(() => {
         currentStep++;
-        let newVol = stepVolume * currentStep;
-        if (newVol >= targetVolume) {
-            newVol = targetVolume;
+        let newVol = startVolume - stepVolume * currentStep;
+        if (newVol <= 0) {
+            newVol = 0;
             clearInterval(musicFadeInterval);
             musicFadeInterval = null;
+            audio.pause();
+            if (callback) callback();
         }
         audio.volume = newVol;
     }, stepTime);
+}
+
+// ---------- 音乐淡入 ----------
+function fadeInMusic(audio, targetVolume = 0.35, duration = 1500, callback) {
+    if (musicFadeInterval) clearInterval(musicFadeInterval);
+    audio.volume = 0;
+    // 先尝试播放
+    audio.play().then(() => {
+        const stepTime = 50;
+        const steps = duration / stepTime;
+        const stepVolume = targetVolume / steps;
+        let currentStep = 0;
+        musicFadeInterval = setInterval(() => {
+            currentStep++;
+            let newVol = stepVolume * currentStep;
+            if (newVol >= targetVolume) {
+                newVol = targetVolume;
+                clearInterval(musicFadeInterval);
+                musicFadeInterval = null;
+                if (callback) callback();
+            }
+            audio.volume = newVol;
+        }, stepTime);
+    }).catch(err => {
+        console.log('播放被阻止，等待用户交互', err);
+        // 播放失败，不启动淡入
+    });
+}
+
+// ---------- 音乐循环：淡出 -> 重新播放并淡入 ----------
+function setupLoopWithFade(audio) {
+    if (musicEndedHandler) {
+        audio.removeEventListener('ended', musicEndedHandler);
+    }
+    musicEndedHandler = () => {
+        if (!musicPlaying) return;
+        fadeOutMusic(audio, 1000, () => {
+            audio.currentTime = 0;
+            fadeInMusic(audio, 0.35, 1500);
+        });
+    };
+    audio.addEventListener('ended', musicEndedHandler);
+}
+
+// ---------- 启动音乐（核心函数，确保只执行一次）----------
+function initAutoPlayMusic() {
+    const music = document.getElementById('bgMusic');
+    if (!music) return;
+    if (musicPlaying) return;
+    
+    // 设置 src（只设置一次）
+    if (!music.src || music.src === '') {
+        music.src = 'music.mp3';
+    }
+    
+    // 尝试播放并淡入
+    fadeInMusic(music, 0.35, 1500);
+    musicPlaying = true;
+    setupLoopWithFade(music);
+}
+
+// ---------- 用户首次触摸时启动音乐（保底方案）----------
+function startMusicOnFirstTouch() {
+    if (musicPlaying) return;
+    initAutoPlayMusic();
+    // 移除监听器，避免重复触发
+    document.removeEventListener('touchstart', startMusicOnFirstTouch);
+    document.removeEventListener('click', startMusicOnFirstTouch);
 }
 
 // ---------- 预加载背景图 ----------
@@ -536,21 +607,6 @@ function startFogDissolve() {
     }
 }
 
-// ---------- 立即启动音乐（页面加载后直接播放）----------
-function initAutoPlayMusic() {
-    const music = document.getElementById('bgMusic');
-    if (!music) return;
-    // 只设置一次 src，避免重复加载
-    if (!music.src || music.src === '') {
-        music.src = 'music.mp3';
-    }
-    // 如果音乐尚未播放，则播放并淡入
-    if (!musicPlaying) {
-        fadeInMusic(music, 0.35, 1500);
-        musicPlaying = true;
-    }
-}
-
 // ---------- 页面切换，控制波点透明度并保活音乐 ----------
 function updateDotsOpacity() {
     if (!dotsLayer) return;
@@ -571,7 +627,7 @@ function goToPage(index) {
     if (index === 3) renderLetter();
     if (index === 4) updateCountdownDisplay();
 
-    // 保活音乐：如果音乐被意外暂停，则尝试恢复播放（但不要重复淡入）
+    // 保活音乐：如果音乐被意外暂停且应该播放，则恢复播放
     const music = document.getElementById('bgMusic');
     if (music && music.paused && musicPlaying) {
         music.play().catch(e => console.log('恢复播放失败', e));
@@ -580,7 +636,14 @@ function goToPage(index) {
 
 function nextPage() {
     if (currentPageIdx === 0) {
-        goToPage(1);
+        // 如果音乐还没播放，先启动音乐（确保用户点击封面时有声音）
+        if (!musicPlaying) {
+            initAutoPlayMusic();
+            // 延迟跳转，让音乐有机会启动（但不要太久影响体验）
+            setTimeout(() => goToPage(1), 100);
+        } else {
+            goToPage(1);
+        }
     } 
     else if (currentPageIdx === 1) {
         const nameInput = document.getElementById('guestName');
@@ -691,7 +754,7 @@ function bindEvents() {
     if (confirmBtn) confirmBtn.addEventListener('click', confirmAttendance);
 }
 
-// 页面加载完成后立即播放音乐并执行其他初始化
+// 页面加载完成后立即尝试启动音乐（可能被阻止，但会触发 WeixinJSBridgeReady 或用户交互）
 window.addEventListener('load', () => {
     preloadBgImage();
     setupEnvelope();
@@ -700,7 +763,8 @@ window.addEventListener('load', () => {
     renderLetter();
     updateBgMode();
     updateDotsOpacity();
-    // 立即启动音乐（淡入）
+    
+    // 尝试自动播放（微信内可能被阻止）
     initAutoPlayMusic();
     
     // 兜底：如果封面图未触发loaded，2.5秒后强制显示
@@ -716,16 +780,37 @@ window.addEventListener('load', () => {
     }, 2500);
 });
 
-// 微信内WeixinJSBridgeReady事件也触发一次，确保自动播放
+// 微信专用事件：WeixinJSBridgeReady 触发时立即启动音乐
 if (typeof WeixinJSBridge !== 'undefined') {
     document.addEventListener('WeixinJSBridgeReady', () => {
         if (!musicPlaying) initAutoPlayMusic();
     });
 } else {
+    // 有些版本需要这样监听
     document.addEventListener('WeixinJSBridgeReady', () => {
         if (!musicPlaying) initAutoPlayMusic();
     });
 }
+
+// 监听用户首次触摸，确保音乐在用户第一次点击时启动（保底）
+document.addEventListener('touchstart', startMusicOnFirstTouch, { once: true });
+document.addEventListener('click', startMusicOnFirstTouch, { once: true });
+
+// 页面可见性变化时保活音乐
+document.addEventListener('visibilitychange', () => {
+    const music = document.getElementById('bgMusic');
+    if (!document.hidden && music && music.paused && musicPlaying) {
+        music.play().catch(e => console.log('恢复播放失败', e));
+    }
+});
+
+// 定期心跳检测（每5秒检查一次）
+setInterval(() => {
+    const music = document.getElementById('bgMusic');
+    if (music && music.paused && musicPlaying) {
+        music.play().catch(e => console.log('心跳恢复播放失败', e));
+    }
+}, 5000);
 </script>
 </body>
 </html>
