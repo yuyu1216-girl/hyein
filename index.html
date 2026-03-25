@@ -10,7 +10,10 @@
 <meta property="og:description" content="✨ Open it ✨ ">
 <meta property="og:image" content="./cover.jpg">
 
-<link rel="preload" as="image" href="./cover.jpg">
+<!-- 预加载 & 预连接优化 -->
+<link rel="preload" as="image" href="./cover.jpg" fetchpriority="high">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Noto+Serif+SC:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
@@ -46,8 +49,10 @@ body {
     background: #d9c6ea url('./cover.jpg') center/cover no-repeat;
     filter: blur(20px);
     transform: scale(1.1);
-    transition: filter 1s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 1s ease-out;
+    transition: filter 0.9s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.9s ease-out;
     z-index: 0;
+    /* 背景图片加载前显示底色，避免白屏 */
+    background-color: #d9c6ea;
 }
 .bg::after {
     content: "";
@@ -55,7 +60,7 @@ body {
     width: 100%;
     height: 100%;
     background: rgba(217, 198, 234, 0.65);
-    transition: opacity 1s ease-out;
+    transition: opacity 0.9s ease-out;
     opacity: 1;
 }
 /* 雾层散开后的清晰状态（由js动态添加类） */
@@ -67,7 +72,7 @@ body {
     opacity: 0;
 }
 
-/* 波点装饰 (用户保留，氛围用) */
+/* 波点装饰 (氛围用) */
 .dots {
     position: fixed;
     width: 100%;
@@ -124,24 +129,30 @@ body {
     pointer-events: auto;
 }
 
-/* 封面图 */
+/* 封面图 - 优化渲染性能 */
 .cover {
     width: 92%;
     max-width: 640px;
     border-radius: 32px;
     box-shadow: 0 25px 40px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: transform 0.3s ease, opacity 0.6s ease;
+    will-change: transform, opacity;
     opacity: 0;
     transform: scale(0.98);
-    animation: coverReveal 1.2s ease forwards;
-    cursor: pointer;
-    transition: transform 0.3s;
+    /* 初始透明，加载完成后由 JS 触发显示动画 */
+}
+.cover.loaded {
+    opacity: 1;
+    transform: scale(1);
+    animation: coverGlow 0.7s ease-out;
+}
+@keyframes coverGlow {
+    0% { opacity: 0; transform: scale(0.96); filter: blur(2px); }
+    100% { opacity: 1; transform: scale(1); filter: blur(0); }
 }
 .cover:hover {
     transform: scale(1.01);
-}
-@keyframes coverReveal {
-    0% { opacity: 0; transform: scale(0.96); }
-    100% { opacity: 1; transform: scale(1); }
 }
 
 /* 标题 */
@@ -367,13 +378,16 @@ body {
 
 <!-- 封面页 P1 -->
 <div class="page active" id="page1">
-    <img src="./cover.jpg" class="cover" alt="Hyein Invitation" onerror="this.src='https://placehold.co/600x800?text=🌸+Cover+Missing+🌸';">
+    <img src="./cover.jpg" class="cover" alt="Hyein Invitation" 
+         fetchpriority="high" 
+         loading="eager"
+         id="coverImg">
 </div>
 
 <!-- 输入昵称 P2 -->
 <div class="page" id="page2">
     <div class="title">Hyein Invitation</div>
-    <input type="text" id="guestName" class="input-name" placeholder="Your Name / nickname" autocomplete="off">
+    <input type="text" id="guestName" class="input-name" placeholder="Nickname" autocomplete="off">
     <button class="btn" id="okNameBtn">OK</button>
 </div>
 
@@ -396,11 +410,11 @@ body {
 <div class="page" id="page5">
     <div class="card">
         💜 Happy Hyein's Day 💜<br>
-        📅 2026.04.18 (周六)<br>
-        📍 <span class="map-link" id="mapTrigger">益+ coffee & tea</span><br>
-        🎀 Dress Code：紫色 / 波点元素<br>
+         2026.04.18<br>
+         <span class="map-link" id="mapTrigger">益+ coffee & tea</span><br>
+        🎀 Dress Code：紫色 / 波点元素🎀<br>
         <div class="countdown-box" id="countdownDisplay">⏳ 计算中...</div>
-        <button class="btn" id="confirmBtn" style="margin-top: 1rem;">✨ 我要来 ✨</button>
+        <button class="btn" id="confirmBtn" style="margin-top: 1rem;">我要来</button>
     </div>
 </div>
 
@@ -408,16 +422,51 @@ body {
 // ---------- DOM 元素 ----------
 const bgLayer = document.getElementById('bgLayer');
 const pages = [document.getElementById('page1'), document.getElementById('page2'), document.getElementById('page3'), document.getElementById('page4'), document.getElementById('page5')];
-let currentPageIdx = 0;        // 0-based: 0封面 1姓名 2信封 3信件 4信息
+let currentPageIdx = 0;
 let userName = "Bunnies";
 let envelopeOpened = false;
 let musicPlaying = false;
+let fogDissolved = false;      // 确保雾层只散开一次
+let coverLoaded = false;
 
-// ---------- 雾层一秒散开 (封面图清晰露出) ----------
+// ---------- 封面图加载处理（稳健降级）----------
+const coverImg = document.getElementById('coverImg');
+function handleCoverLoaded() {
+    if (coverLoaded) return;
+    coverLoaded = true;
+    // 添加loaded类触发渐显动画
+    coverImg.classList.add('loaded');
+    // 封面图加载完成后，再启动雾层散开（一秒散开效果）
+    if (!fogDissolved) {
+        setTimeout(() => {
+            startFogDissolve();
+        }, 80); // 稍微延迟让封面动画更平滑
+        fogDissolved = true;
+    }
+}
+function handleCoverError() {
+    // 优雅降级：使用内嵌 SVG 渐变 + 文字占位，完全本地，无需网络请求，杜绝 missing
+    const svgData = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 1000'%3E%3Crect width='100%25' height='100%25' fill='%23d9c6ea'/%3E%3Ctext x='50%25' y='45%25' font-size='32' font-family='monospace' fill='%238c5cff' text-anchor='middle'%3E🐹 Hyein's Party 🐹%3C/text%3E%3Ctext x='50%25' y='55%25' font-size='24' fill='%23a97cff' text-anchor='middle'%3E💜 紫色波点之约 💜%3C/text%3E%3C/svg%3E`;
+    coverImg.src = svgData;
+    // 即使降级，依然触发加载完成效果
+    handleCoverLoaded();
+}
+if (coverImg) {
+    if (coverImg.complete && coverImg.naturalWidth !== 0) {
+        // 图片已缓存，直接触发
+        handleCoverLoaded();
+    } else {
+        coverImg.addEventListener('load', handleCoverLoaded);
+        coverImg.addEventListener('error', handleCoverError);
+    }
+} else {
+    // 极端情况无img元素，直接散开雾层
+    startFogDissolve();
+}
+
+// ---------- 雾层一秒散开 (背景清晰露出) ----------
 function startFogDissolve() {
-    // 保证背景过渡平滑, 添加clear类去除模糊/缩放 + 半透明遮罩消失
-    if (bgLayer) {
-        // 强制触发重绘，立即开始过渡
+    if (bgLayer && !bgLayer.classList.contains('clear')) {
         bgLayer.classList.add('clear');
     }
 }
@@ -427,21 +476,16 @@ function initAutoPlayMusic() {
     const music = document.getElementById('bgMusic');
     if (!music) return;
     music.volume = 0.35;
-    
     const tryPlay = () => {
         music.play().then(() => {
             musicPlaying = true;
-        }).catch(e => {
-            // 静默失败，等待用户首次交互
-        });
+        }).catch(() => {});
     };
-    // 微信及移动端常用交互解锁
     document.addEventListener('click', tryPlay, { once: true });
     document.addEventListener('touchstart', tryPlay, { once: true });
     document.addEventListener('WeixinJSBridgeReady', () => {
         music.play().catch(()=>{});
     });
-    // 如果页面加载后很快有交互，尝试播放
     setTimeout(() => {
         if (!musicPlaying) tryPlay();
     }, 800);
@@ -450,44 +494,27 @@ function initAutoPlayMusic() {
 // ---------- 页面切换 ----------
 function goToPage(index) {
     if (index < 0 || index >= pages.length) return;
-    // 隐藏所有页面
     pages.forEach(page => page.classList.remove('active'));
     pages[index].classList.add('active');
     currentPageIdx = index;
-    
-    // 特殊逻辑: 进入信件页(p4)时动态渲染最新信件内容
-    if (index === 3) {
-        renderLetter();
-    }
-    // 进入详情页(p5) 刷新倒计时
-    if (index === 4) {
-        updateCountdownDisplay();
-    }
+    if (index === 3) renderLetter();
+    if (index === 4) updateCountdownDisplay();
 }
 
-// 下一页 (通用)
 function nextPage() {
     if (currentPageIdx === 0) {
         goToPage(1);
     } 
     else if (currentPageIdx === 1) {
-        // 姓名输入验证
         const nameInput = document.getElementById('guestName');
         let inputName = nameInput.value.trim();
-        if (inputName !== "") {
-            userName = inputName;
-        } else {
-            userName = "Bunnies";
-        }
+        userName = inputName !== "" ? inputName : "Bunnies";
         goToPage(2);
     }
     else if (currentPageIdx === 2) {
-        // 信封页: 如果还没打开信封, 不允许翻页, 需先打开信封
         if (!envelopeOpened) {
-            // 提示先打开信封
             const hintDiv = document.querySelector('#page3 .hint');
             hintDiv.style.transform = "scale(1.05)";
-            hintDiv.style.transition = "0.2s";
             setTimeout(() => { hintDiv.style.transform = ""; }, 300);
             return;
         }
@@ -496,10 +523,8 @@ function nextPage() {
     else if (currentPageIdx === 3) {
         goToPage(4);
     }
-    // 最后一页不再继续
 }
 
-// 渲染信件 (根据用户名)
 function renderLetter() {
     const letterDiv = document.getElementById('letterContent');
     if (!letterDiv) return;
@@ -516,9 +541,8 @@ function renderLetter() {
     `;
 }
 
-// 倒计时更新 (目标 2026.04.18)
 function updateCountdownDisplay() {
-    const targetDate = new Date(2026, 3, 18, 0, 0, 0); // 月份4月 => index 3
+    const targetDate = new Date(2026, 3, 18, 0, 0, 0);
     const now = new Date();
     const diff = targetDate - now;
     const countdownEl = document.getElementById('countdownDisplay');
@@ -533,28 +557,22 @@ function updateCountdownDisplay() {
     countdownEl.innerHTML = `⏳ 倒计时：${days}天 ${hours}小时 ${mins}分`;
 }
 
-// 定时刷新倒计时 (全局)
 let countdownInterval = null;
 function startCountdownTimer() {
     if (countdownInterval) clearInterval(countdownInterval);
     updateCountdownDisplay();
-    countdownInterval = setInterval(() => {
-        updateCountdownDisplay();
-    }, 1000);
+    countdownInterval = setInterval(updateCountdownDisplay, 1000);
 }
 
-// 地图跳转
 function openMap() {
     window.open("https://surl.amap.com/cYD2lgm1A9q1", "_blank");
 }
 
-// 爱心特效 + 确认弹窗
 function confirmAttendance() {
-    // 爱心雨
     for (let i = 0; i < 20; i++) {
         const heart = document.createElement('div');
         heart.className = 'heart-fly';
-        heart.innerHTML = ['💜', '💖', '🐹', '✨', '🌸', '🎀'][Math.floor(Math.random() * 6)];
+        heart.innerHTML = ['💜', '💖', '🐹', '✨', '🐳', '🎀'][Math.floor(Math.random() * 6)];
         heart.style.left = Math.random() * 100 + 'vw';
         heart.style.bottom = '10vh';
         heart.style.fontSize = 1.5 + Math.random() * 1.2 + 'rem';
@@ -562,10 +580,9 @@ function confirmAttendance() {
         document.body.appendChild(heart);
         setTimeout(() => heart.remove(), 1400);
     }
-    alert(`🍓 ${userName}  💜 我们4.18见！记得穿紫色或波点哟 💜`);
+    alert(`🍓 ${userName}，我们4.18见！💜`);
 }
 
-// 信封打开逻辑
 function setupEnvelope() {
     const envelope = document.getElementById('envelopeBox');
     if (!envelope) return;
@@ -574,119 +591,48 @@ function setupEnvelope() {
         if (!envelopeOpened) {
             envelope.classList.add('open');
             envelopeOpened = true;
-            // 打开信封后，稍微延迟可点击提示进入下页
             const hintMsg = document.querySelector('#page3 .hint');
-            if (hintMsg) hintMsg.innerHTML = "💌 信已开启 · 轻触继续 💌";
+            if (hintMsg) hintMsg.innerHTML = "Click it";
         } else {
-            // 已打开，再次点击跳转下一页
             nextPage();
         }
     });
 }
 
-// 所有手动绑定事件
 function bindEvents() {
-    // 封面点击翻页
-    const coverImg = document.querySelector('#page1 .cover');
-    if (coverImg) coverImg.addEventListener('click', () => nextPage());
-    
-    // 确定昵称按钮
+    const coverImgClick = document.querySelector('#page1 .cover');
+    if (coverImgClick) coverImgClick.addEventListener('click', () => nextPage());
     const okBtn = document.getElementById('okNameBtn');
     if (okBtn) okBtn.addEventListener('click', () => nextPage());
-    
-    // 输入框按回车也可以
     const nameInput = document.getElementById('guestName');
-    if (nameInput) {
-        nameInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') nextPage();
-        });
-    }
-    
-    // 信件页点击继续 (任意位置)
+    if (nameInput) nameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') nextPage(); });
     const pageLetter = document.getElementById('page4');
-    if (pageLetter) pageLetter.addEventListener('click', (e) => {
-        // 防止点到内部按钮冒泡影响，直接继续
-        nextPage();
-    });
-    
-    // 地图链接
+    if (pageLetter) pageLetter.addEventListener('click', () => nextPage());
     const mapSpan = document.getElementById('mapTrigger');
     if (mapSpan) mapSpan.addEventListener('click', openMap);
-    
-    // 确认参加按钮
     const confirmBtn = document.getElementById('confirmBtn');
     if (confirmBtn) confirmBtn.addEventListener('click', confirmAttendance);
-    
-    // 额外确保信封页如果没有打开信封就试图通过其他nextPage方式，已经做了防护
 }
 
-// 背景音乐预加载辅助
-function preloadAndMusic() {
-    initAutoPlayMusic();
-}
-
-// 初始化整体流程，修复各种bug，雾层散开调用
+// 初始化
 window.addEventListener('load', () => {
-    // 1. 修复信封交互
     setupEnvelope();
-    // 2. 绑定页面事件
     bindEvents();
-    // 3. 启动倒计时
     startCountdownTimer();
-    // 4. 音乐自动播放尝试
-    preloadAndMusic();
-    // 5. 初始信件内容(以防直接跳转？但默认在封面)
-    renderLetter();
-    // 6. 雾层一秒散开: 让背景清晰露出封面图
+    initAutoPlayMusic();
+    renderLetter();          // 预渲染信件内容
+    // 如果封面图在load之前已经加载完成，handleCoverLoaded已调用；如果未完成则等待事件。
+    // 额外兜底：若3秒后封面仍未触发loaded（罕见情况），手动强制散开雾层
     setTimeout(() => {
-        startFogDissolve();
-    }, 100);  // 轻微延迟确保过渡自然，封面图加载后雾层优雅散开
-    // 7. 如果封面图加载失败友好占位
-    const coverImgDom = document.querySelector('.cover');
-    if (coverImgDom) {
-        coverImgDom.addEventListener('error', () => {
-            coverImgDom.src = "https://placehold.co/800x1000?text=🐹+Hyein+Party+🐹&bg=EFE0FF";
-        });
-    }
-    
-    // 额外增强: 防止部分浏览器背景模糊初始化未完全，再保险一次
-    setTimeout(() => {
-        if (bgLayer && !bgLayer.classList.contains('clear')) {
-            bgLayer.classList.add('clear');
+        if (!coverLoaded) {
+            coverImg.classList.add('loaded');
+            if (!fogDissolved) {
+                startFogDissolve();
+                fogDissolved = true;
+            }
         }
-    }, 1200);
+    }, 2500);
 });
-
-// 如果用户快速点击翻页导致未定义userName的情况, 在输入页已经处理
-// 修复所有潜在bug:
-// - 原nextPage未定义 => 完善全局nextPage
-// - 原createDots不存在 => 删除无用调用
-// - 原updateLetter不存在 => renderLetter
-// - 原倒计时元素缺失 => 增加countdownDisplay
-// - 原p4标签未闭合 => 修复html结构
-// - 原音乐自动播放策略增强
-// - 信封打开逻辑二次点击可进入下一页
-// - 卡片页增加倒计时实时显示
-// - 雾层散开并且封面图彻底清晰, bg::after透明度降低消失, 无遮挡
-
-// 兼容移动端触摸优化
-document.querySelectorAll('.btn, .envelope, .map-link, .cover').forEach(el => {
-    el.addEventListener('touchstart', (e) => {
-        // 只是为了提高响应感，不做额外动作
-    }, { passive: true });
-});
-
-// 确保背景图比例稳定，防止页面滚动
-window.addEventListener('resize', () => {
-    // 保持背景覆盖，无需额外
-});
-
-// 最后确保信件页如果因为某些情况未渲染，手动重新渲染一次
-setInterval(() => {
-    if (currentPageIdx === 3) {
-        renderLetter();
-    }
-}, 500);
 </script>
 </body>
 </html>
