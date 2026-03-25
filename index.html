@@ -510,20 +510,24 @@ function setupLoopWithFade(audio) {
     audio.addEventListener('ended', musicEndedHandler);
 }
 
-// ---------- 启动音乐（确保自动播放）----------
+// ---------- 音乐自动播放 ----------
 function initAutoPlayMusic() {
     const music = document.getElementById('bgMusic');
     if (!music) return;
-    if (musicPlaying) return;
-    
-    if (!music.src || music.src === '') {
-        music.src = 'music.mp3';
-        music.load();
-    }
-    
-    fadeInMusic(music, 0.35, 1500);
-    musicPlaying = true;
-    setupLoopWithFade(music);
+    music.volume = 0.35;
+    const tryPlay = () => {
+        music.play().then(() => {
+            musicPlaying = true;
+        }).catch(() => {});
+    };
+    document.addEventListener('click', tryPlay, { once: true });
+    document.addEventListener('touchstart', tryPlay, { once: true });
+    document.addEventListener('WeixinJSBridgeReady', () => {
+        music.play().catch(()=>{});
+    });
+    setTimeout(() => {
+        if (!musicPlaying) tryPlay();
+    }, 800);
 }
 
 // ---------- 预加载背景图 ----------
