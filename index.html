@@ -540,16 +540,18 @@ function startFogDissolve() {
 function initAutoPlayMusic() {
     const music = document.getElementById('bgMusic');
     if (!music) return;
-    // 设置音频源（避免页面加载时预下载大文件）
-    music.src = 'music.mp3';
-    // 立即播放并淡入
+    // 只设置一次 src，避免重复加载
+    if (!music.src || music.src === '') {
+        music.src = 'music.mp3';
+    }
+    // 如果音乐尚未播放，则播放并淡入
     if (!musicPlaying) {
         fadeInMusic(music, 0.35, 1500);
         musicPlaying = true;
     }
 }
 
-// ---------- 页面切换，控制波点透明度 ----------
+// ---------- 页面切换，控制波点透明度并保活音乐 ----------
 function updateDotsOpacity() {
     if (!dotsLayer) return;
     if (currentPageIdx === 0) {
@@ -568,6 +570,12 @@ function goToPage(index) {
     updateDotsOpacity();
     if (index === 3) renderLetter();
     if (index === 4) updateCountdownDisplay();
+
+    // 保活音乐：如果音乐被意外暂停，则尝试恢复播放（但不要重复淡入）
+    const music = document.getElementById('bgMusic');
+    if (music && music.paused && musicPlaying) {
+        music.play().catch(e => console.log('恢复播放失败', e));
+    }
 }
 
 function nextPage() {
