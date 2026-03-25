@@ -390,7 +390,8 @@ body {
 <div class="bg" id="bgLayer"></div>
 <div class="dots" id="dotsLayer"></div>
 
-<audio id="bgMusic" loop preload="auto"></audio>
+<!-- 音频元素：直接设置 src 和 loop，简单可靠 -->
+<audio id="bgMusic" src="music.mp3" loop preload="auto"></audio>
 
 <!-- 封面页 P1 -->
 <div class="page active" id="page1">
@@ -445,87 +446,33 @@ let musicPlaying = false;
 let fogDissolved = false;
 let coverLoaded = false;
 let bgImageLoaded = false;
-let musicFadeInterval = null;
-let musicEndedHandler = null;
 
-// ---------- 音乐淡出 ----------
-function fadeOutMusic(audio, duration = 1000, callback) {
-    if (musicFadeInterval) clearInterval(musicFadeInterval);
-    const startVolume = audio.volume;
-    const stepTime = 50;
-    const steps = duration / stepTime;
-    const stepVolume = startVolume / steps;
-    let currentStep = 0;
-    musicFadeInterval = setInterval(() => {
-        currentStep++;
-        let newVol = startVolume - stepVolume * currentStep;
-        if (newVol <= 0) {
-            newVol = 0;
-            clearInterval(musicFadeInterval);
-            musicFadeInterval = null;
-            audio.pause();
-            if (callback) callback();
-        }
-        audio.volume = newVol;
-    }, stepTime);
-}
-
-// ---------- 音乐淡入 ----------
-function fadeInMusic(audio, targetVolume = 0.35, duration = 1500, callback) {
-    if (musicFadeInterval) clearInterval(musicFadeInterval);
-    audio.volume = 0;
-    audio.play().then(() => {
-        const stepTime = 50;
-        const steps = duration / stepTime;
-        const stepVolume = targetVolume / steps;
-        let currentStep = 0;
-        musicFadeInterval = setInterval(() => {
-            currentStep++;
-            let newVol = stepVolume * currentStep;
-            if (newVol >= targetVolume) {
-                newVol = targetVolume;
-                clearInterval(musicFadeInterval);
-                musicFadeInterval = null;
-                if (callback) callback();
-            }
-            audio.volume = newVol;
-        }, stepTime);
-    }).catch(err => {
-        console.log('自动播放被阻止，等待 WeixinJSBridgeReady', err);
-    });
-}
-
-// ---------- 音乐循环：淡出 -> 重新播放并淡入 ----------
-function setupLoopWithFade(audio) {
-    if (musicEndedHandler) {
-        audio.removeEventListener('ended', musicEndedHandler);
-    }
-    musicEndedHandler = () => {
-        if (!musicPlaying) return;
-        fadeOutMusic(audio, 1000, () => {
-            audio.currentTime = 0;
-            fadeInMusic(audio, 0.35, 1500);
-        });
-    };
-    audio.addEventListener('ended', musicEndedHandler);
-}
-
-// ---------- 启动音乐（带淡入淡出循环）----------
+// ---------- 简单音乐自动播放（无淡入淡出）----------
 function initAutoPlayMusic() {
     const music = document.getElementById('bgMusic');
     if (!music) return;
-    if (musicPlaying) return;
-    
-    // 设置 src（只设置一次）
-    if (!music.src || music.src === '') {
-        music.src = 'music.mp3';
-        music.load();
-    }
-    
-    // 播放并淡入
-    fadeInMusic(music, 0.35, 1500);
-    musicPlaying = true;
-    setupLoopWithFade(music);
+    music.volume = 0.5; // 设置合适音量
+    const tryPlay = () => {
+        music.play().then(() => {
+            musicPlaying = true;
+            console.log('音乐播放成功');
+        }).catch(err => {
+            console.log('自动播放被阻止:', err);
+        });
+    };
+    // 微信专用事件
+    document.addEventListener('WeixinJSBridgeReady', () => {
+        tryPlay();
+    });
+    // 页面加载后尝试播放
+    setTimeout(tryPlay, 100);
+    // 用户首次触摸保底（如果自动播放失败）
+    document.addEventListener('click', () => {
+        if (!musicPlaying) tryPlay();
+    }, { once: true });
+    document.addEventListener('touchstart', () => {
+        if (!musicPlaying) tryPlay();
+    }, { once: true });
 }
 
 // ---------- 预加载背景图 ----------
@@ -596,7 +543,7 @@ function startFogDissolve() {
     }
 }
 
-// ---------- 页面切换，控制波点透明度并保活音乐 ----------
+// ---------- 页面切换，控制波点透明度 ----------
 function updateDotsOpacity() {
     if (!dotsLayer) return;
     if (currentPageIdx === 0) {
@@ -616,6 +563,7 @@ function goToPage(index) {
     if (index === 3) renderLetter();
     if (index === 4) updateCountdownDisplay();
 
+    // 保活音乐：如果音乐被意外暂停且应该播放，则恢复
     const music = document.getElementById('bgMusic');
     if (music && music.paused && musicPlaying) {
         music.play().catch(e => console.log('恢复播放失败', e));
@@ -736,7 +684,7 @@ function bindEvents() {
     if (confirmBtn) confirmBtn.addEventListener('click', confirmAttendance);
 }
 
-// 页面加载完成后立即启动音乐并执行其他初始化
+// 初始化
 window.addEventListener('load', () => {
     preloadBgImage();
     setupEnvelope();
@@ -746,9 +694,10 @@ window.addEventListener('load', () => {
     updateBgMode();
     updateDotsOpacity();
     
-    // 立即启动音乐（淡入）
+    // 启动音乐
     initAutoPlayMusic();
     
+    // 兜底：如果封面图未触发loaded，2.5秒后强制显示
     setTimeout(() => {
         if (!coverLoaded) {
             coverImg.classList.add('loaded');
@@ -760,17 +709,6 @@ window.addEventListener('load', () => {
         }
     }, 2500);
 });
-
-// 微信专用事件：确保自动播放
-if (typeof WeixinJSBridge !== 'undefined') {
-    document.addEventListener('WeixinJSBridgeReady', () => {
-        if (!musicPlaying) initAutoPlayMusic();
-    });
-} else {
-    document.addEventListener('WeixinJSBridgeReady', () => {
-        if (!musicPlaying) initAutoPlayMusic();
-    });
-}
 
 // 页面可见性变化时保活音乐
 document.addEventListener('visibilitychange', () => {
