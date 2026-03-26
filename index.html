@@ -57,7 +57,7 @@ body {
 /* 封面模式：显示图片 + 模糊 + 缩放 */
 .bg.cover-mode {
     background: #e2d5f0 url('./cover.jpg') center/cover no-repeat;
-    filter: blur(30px);          /* 增强模糊效果 */
+    filter: blur(10px);          /* 增强模糊效果 */
     transform: scale(1.1);
 }
 .bg.cover-mode::after {
@@ -69,10 +69,10 @@ body {
     transition: opacity 0.9s ease-out;
     opacity: 1;
 }
-/* 雾层散开（仅封面模式生效）- 只移除遮罩，保持背景模糊 */
+/* 雾层散开（仅封面模式生效）- 只移除遮罩，背景轻度模糊，可辨认图案 */
 .bg.cover-mode.clear {
-    filter: blur(12px);   /* 保持模糊 */
-    transform: scale(1.1); /* 保持缩放，避免位置突变 */
+    filter: blur(5px);    /* 进一步降低模糊，能看清图案轮廓 */
+    transform: scale(1.03); /* 缩小缩放比例，减少像素拉伸带来的模糊感 */
 }
 .bg.cover-mode.clear::after {
     opacity: 0;
