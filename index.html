@@ -53,10 +53,11 @@ body {
     transition: filter 0.9s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.9s ease-out;
     z-index: 0;
 }
+    
 /* 封面模式：显示图片 + 模糊 + 缩放 */
 .bg.cover-mode {
     background: #e2d5f0 url('./cover.jpg') center/cover no-repeat;
-    filter: blur(30px);          /* 增强模糊效果，从 20px → 30px */
+    filter: blur(30px);          /* 增强模糊效果 */
     transform: scale(1.1);
 }
 .bg.cover-mode::after {
@@ -64,14 +65,14 @@ body {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: rgba(226, 213, 240, 0.15); /* 降低遮罩透明度，让模糊更明显 */
+    background: rgba(226, 213, 240, 0.15); /* 半透明遮罩 */
     transition: opacity 0.9s ease-out;
     opacity: 1;
 }
-/* 雾层散开（仅封面模式生效） */
+/* 雾层散开（仅封面模式生效）- 只移除遮罩，保持背景模糊 */
 .bg.cover-mode.clear {
-    filter: blur(0px);
-    transform: scale(1);
+    filter: blur(30px);   /* 保持模糊 */
+    transform: scale(1.1); /* 保持缩放，避免位置突变 */
 }
 .bg.cover-mode.clear::after {
     opacity: 0;
